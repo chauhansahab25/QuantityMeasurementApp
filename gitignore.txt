@@ -1,0 +1,95 @@
+# ==============================
+# Build results
+# ==============================
+bin/
+obj/
+out/
+
+# ==============================
+# Visual Studio files
+# ==============================
+.vs/
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ==============================
+# VS Code Specific
+# ==============================
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History (VS Code plugin)
+.history/
+
+# ==============================
+# Rider / JetBrains
+# ==============================
+.idea/
+*.sln.iml
+
+# ==============================
+# OS generated files
+# ==============================
+[Dd]esktop.ini
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.DS_Store
+
+# ==============================
+# Logs
+# ==============================
+*.log
+
+# ==============================
+# NuGet
+# ==============================
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+!packages/build/
+
+# ==============================
+# Publish output
+# ==============================
+publish/
+
+# ==============================
+# ASP.NET Core
+# ==============================
+appsettings.Development.json
+appsettings.Production.json
+
+# ==============================
+# Test results
+# ==============================
+TestResults/
+
+# ==============================
+# Code coverage
+# ==============================
+coverage/
+*.coverage
+*.coveragexml
+
+# ==============================
+# Secrets
+# ==============================
+secrets.json
+*.pfx
+*.key
+
+# ==============================
+# Temporary files
+# ==============================
+*.tmp
+*.temp
