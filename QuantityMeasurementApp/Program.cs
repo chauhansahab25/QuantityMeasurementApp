@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using QuantityMeasurementApp.Model;
 
 namespace QuantityMeasurementApp
@@ -9,29 +9,42 @@ namespace QuantityMeasurementApp
         {
             try
             {
-                Console.WriteLine("Enter value:");
-                double value = Convert.ToDouble(Console.ReadLine());
+                Console.WriteLine("Enter First Quantity");
 
-                Console.WriteLine("Enter unit (FEET / INCH):");
-                string unitInput = Console.ReadLine()?.ToUpper();
+                Console.Write("Value: ");
+                double value1 = Convert.ToDouble(Console.ReadLine());
 
-                Unit unit = unitInput switch
-                {
-                    "FEET" => Unit.FEET,
-                    "INCH" => Unit.INCH,
-                    _ => throw new ArgumentException("Invalid unit entered")
-                };
+                Console.Write("Unit (Feet, Inches, Yards, Centimeters): ");
+                Unit unit1 = ParseUnit(Console.ReadLine());
 
-                Quantity quantity = new Quantity(value, unit);
+                var quantity1 = new Quantity(value1, unit1);
 
-                Console.WriteLine($"Quantity created: {quantity.Value} {quantity.Unit}");
+                Console.WriteLine("\nEnter Second Quantity");
+
+                Console.Write("Value: ");
+                double value2 = Convert.ToDouble(Console.ReadLine());
+
+                Console.Write("Unit (Feet, Inches, Yards, Centimeters): ");
+                Unit unit2 = ParseUnit(Console.ReadLine());
+
+                var quantity2 = new Quantity(value2, unit2);
+
+                bool result = quantity1.Equals(quantity2);
+
+                Console.WriteLine($"\nAre they equal? {result}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
+        }
 
-            Console.ReadLine();
+        private static Unit ParseUnit(string input)
+        {
+            if (Enum.TryParse(typeof(Unit), input, true, out object unit))
+                return (Unit)unit;
+
+            throw new ArgumentException("Invalid unit entered.");
         }
     }
 }

@@ -2,7 +2,9 @@ namespace QuantityMeasurementApp.Model
 {
     public enum Unit
     {
-        FEET,
-        INCH
+        Feet,
+        Inches,
+        Yards,
+        Centimeters
     }
 }

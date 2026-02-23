@@ -2,63 +2,52 @@ using System;
 
 namespace QuantityMeasurementApp.Model
 {
-    public class Quantity : IEquatable<Quantity>
+    public class Quantity
     {
-        public double Value { get; }
-        public Unit Unit { get; }
+        private readonly double value;
+        private readonly Unit unit;
+
+        private const double TOLERANCE = 0.0001;
 
         public Quantity(double value, Unit unit)
         {
             if (value < 0)
-                throw new ArgumentException("Value cannot be negative");
+                throw new ArgumentException("Length cannot be negative");
 
-            
             if (!Enum.IsDefined(typeof(Unit), unit))
-                throw new ArgumentException("Invalid unit");
+                throw new ArgumentException("Invalid unit provided");
 
-            Value = value;
-            Unit = unit;
+            this.value = value;
+            this.unit = unit;
         }
 
         private double ToInches()
         {
-            return Unit switch
+            return unit switch
             {
-                Unit.FEET => Value * 12,
-                Unit.INCH => Value,
-                _ => throw new ArgumentException("Invalid unit")
+                Unit.Feet => value * 12,
+                Unit.Inches => value,
+                Unit.Yards => value * 36,
+                Unit.Centimeters => value * 0.393701,
+                _ => throw new InvalidOperationException("Invalid unit")
             };
-        }
-
-        public bool Equals(Quantity? other)
-        {
-            if (other is null)
-                return false;
-
-            return this.ToInches() == other.ToInches();
         }
 
         public override bool Equals(object obj)
         {
-            return Equals(obj as Quantity);
+            if (ReferenceEquals(this, obj))
+                return true;
+
+            if (obj is not Quantity other)
+                return false;
+
+            return Math.Abs(this.ToInches() - other.ToInches()) < TOLERANCE;
         }
 
         public override int GetHashCode()
         {
-            return ToInches().GetHashCode();
-        }
-
-        public static bool operator ==(Quantity left, Quantity right)
-        {
-            if (left is null)
-                return right is null;
-
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(Quantity left, Quantity right)
-        {
-            return !(left == right);
+            // Round to match tolerance to keep equality contract safe
+            return Math.Round(ToInches(), 4).GetHashCode();
         }
     }
 }
