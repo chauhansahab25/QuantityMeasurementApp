@@ -1,53 +1,61 @@
 using System;
+using System.Collections.Generic;
 
 namespace QuantityMeasurementApp.Model
 {
     public class Quantity
     {
-        private readonly double value;
-        private readonly Unit unit;
+        public double Value { get; }
+        public Unit Unit { get; }
 
-        private const double TOLERANCE = 0.0001;
+        private const double EPSILON = 1e-6;
+
+        private static readonly Dictionary<Unit, double> conversionToFeet =
+            new Dictionary<Unit, double>
+        {
+            { Unit.FEET, 1.0 },
+            { Unit.INCH, 1.0 / 12.0 },
+            { Unit.YARD, 3.0 },
+            { Unit.CENTIMETER, 1.0 / 30.48 }
+        };
 
         public Quantity(double value, Unit unit)
         {
-            if (value < 0)
-                throw new ArgumentException("Length cannot be negative");
-
             if (!Enum.IsDefined(typeof(Unit), unit))
-                throw new ArgumentException("Invalid unit provided");
+                throw new ArgumentException("Invalid Unit");
 
-            this.value = value;
-            this.unit = unit;
+            if (double.IsNaN(value) || double.IsInfinity(value))
+                throw new ArgumentException("Invalid numeric value");
+
+            Value = value;
+            Unit = unit;
         }
 
-        private double ToInches()
+        public double ConvertTo(Unit targetUnit)
         {
-            return unit switch
-            {
-                Unit.Feet => value * 12,
-                Unit.Inches => value,
-                Unit.Yards => value * 36,
-                Unit.Centimeters => value * 0.393701,
-                _ => throw new InvalidOperationException("Invalid unit")
-            };
+            if (!Enum.IsDefined(typeof(Unit), targetUnit))
+                throw new ArgumentException("Invalid Target Unit");
+
+            double valueInFeet = Value * conversionToFeet[Unit];
+
+            return valueInFeet / conversionToFeet[targetUnit];
         }
 
+        
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj))
-                return true;
-
             if (obj is not Quantity other)
                 return false;
 
-            return Math.Abs(this.ToInches() - other.ToInches()) < TOLERANCE;
+            double thisInFeet = Value * conversionToFeet[Unit];
+            double otherInFeet = other.Value * conversionToFeet[other.Unit];
+
+            return Math.Abs(thisInFeet - otherInFeet) < EPSILON;
         }
 
         public override int GetHashCode()
         {
-            // Round to match tolerance to keep equality contract safe
-            return Math.Round(ToInches(), 4).GetHashCode();
+            return (Value, Unit).GetHashCode();
         }
     }
 }
