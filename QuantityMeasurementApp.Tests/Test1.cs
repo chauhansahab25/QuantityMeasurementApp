@@ -1,3 +1,4 @@
+﻿
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp;
 
@@ -52,5 +53,50 @@ namespace QuantityMeasurementAppTests
             Assert.IsTrue(f1.Equals(f1),
                 "Object should be equal to itself (reflexive)");
         }
+        [TestClass]
+    public class InchesEqualityTests
+    {
+        [TestMethod]
+        public void TestInchesEquality_SameValue()
+        {
+            var inch1 = new QuantityMeasurementApp.Inches(1.0);
+            var inch2 = new QuantityMeasurementApp.Inches(1.0);
+
+            Assert.IsTrue(inch1.Equals(inch2));
+        }
+
+        [TestMethod]
+        public void TestInchesEquality_DifferentValue()
+        {
+            var inch1 = new QuantityMeasurementApp.Inches(1.0);
+            var inch2 = new QuantityMeasurementApp.Inches(2.0);
+
+            Assert.IsFalse(inch1.Equals(inch2));
+        }
+
+        [TestMethod]
+        public void TestInchesEquality_NullComparison()
+        {
+            var inch = new QuantityMeasurementApp.Inches(1.0);
+
+            Assert.IsFalse(inch.Equals(null));
+        }
+
+        [TestMethod]
+        public void TestInchesEquality_DifferentClass()
+        {
+            var inch = new QuantityMeasurementApp.Inches(1.0);
+
+            Assert.IsFalse(inch.Equals("Invalid Type"));
+        }
+
+        [TestMethod]
+        public void TestInchesEquality_SameReference()
+        {
+            var inch = new QuantityMeasurementApp.Inches(1.0);
+
+            Assert.IsTrue(inch.Equals(inch));
+        }
+    }
     }
 }
