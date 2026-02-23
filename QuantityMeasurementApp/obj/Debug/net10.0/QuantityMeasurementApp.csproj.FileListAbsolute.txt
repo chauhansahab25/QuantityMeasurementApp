@@ -1,0 +1,15 @@
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.GeneratedMSBuildEditorConfig.editorconfig
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.AssemblyInfoInputs.cache
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.AssemblyInfo.cs
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.csproj.CoreCompileInputs.cache
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.sourcelink.json
+E:\QuantityMeasurementApp\QuantityMeasurementApp\bin\Debug\net10.0\QuantityMeasurementApp.exe
+E:\QuantityMeasurementApp\QuantityMeasurementApp\bin\Debug\net10.0\QuantityMeasurementApp.deps.json
+E:\QuantityMeasurementApp\QuantityMeasurementApp\bin\Debug\net10.0\QuantityMeasurementApp.runtimeconfig.json
+E:\QuantityMeasurementApp\QuantityMeasurementApp\bin\Debug\net10.0\QuantityMeasurementApp.dll
+E:\QuantityMeasurementApp\QuantityMeasurementApp\bin\Debug\net10.0\QuantityMeasurementApp.pdb
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.dll
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\refint\QuantityMeasurementApp.dll
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.pdb
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\QuantityMeasurementApp.genruntimeconfig.cache
+E:\QuantityMeasurementApp\QuantityMeasurementApp\obj\Debug\net10.0\ref\QuantityMeasurementApp.dll
