@@ -1,102 +1,105 @@
-﻿
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QuantityMeasurementApp;
+using QuantityMeasurementApp.Model;
+using System;
 
 namespace QuantityMeasurementAppTests
 {
     [TestClass]
-    public class QuantityMeasurementAppTests
+    public class QuantityTests
     {
         [TestMethod]
-        public void TestEquality_SameValue()
+        public void testEquality_FeetToFeet_SameValue()
         {
-            var f1 = new QuantityMeasurementApp.Feet(1.0);
-            var f2 = new QuantityMeasurementApp.Feet(1.0);
+            var q1 = new Quantity(1.0, Unit.FEET);
+            var q2 = new Quantity(1.0, Unit.FEET);
 
-            Assert.IsTrue(f1.Equals(f2),
-                "1.0 ft should be equal to 1.0 ft");
+            Assert.IsTrue(q1.Equals(q2));
         }
 
         [TestMethod]
-        public void TestEquality_DifferentValue()
+        public void testEquality_InchToInch_SameValue()
         {
-            var f1 = new QuantityMeasurementApp.Feet(1.0);
-            var f2 = new QuantityMeasurementApp.Feet(2.0);
+            var q1 = new Quantity(1.0, Unit.INCH);
+            var q2 = new Quantity(1.0, Unit.INCH);
 
-            Assert.IsFalse(f1.Equals(f2),
-                "1.0 ft should not equal 2.0 ft");
+            Assert.IsTrue(q1.Equals(q2));
         }
 
         [TestMethod]
-        public void TestEquality_NullComparison()
+        public void testEquality_FeetToInch_EquivalentValue()
         {
-            var f1 = new QuantityMeasurementApp.Feet(1.0);
+            var q1 = new Quantity(1.0, Unit.FEET);
+            var q2 = new Quantity(12.0, Unit.INCH);
 
-            Assert.IsFalse(f1.Equals(null),
-                "Feet value should not equal null");
+            Assert.IsTrue(q1.Equals(q2));
         }
 
         [TestMethod]
-        public void TestEquality_NonNumericInput()
+        public void testEquality_InchToFeet_EquivalentValue()
         {
-            var f1 = new QuantityMeasurementApp.Feet(1.0);
+            var q1 = new Quantity(12.0, Unit.INCH);
+            var q2 = new Quantity(1.0, Unit.FEET);
 
-            Assert.IsFalse(f1.Equals("1.0"),
-                "Feet object should not equal non-numeric input");
+            Assert.IsTrue(q1.Equals(q2));
         }
 
         [TestMethod]
-        public void TestEquality_SameReference()
+        public void testEquality_FeetToFeet_DifferentValue()
         {
-            var f1 = new QuantityMeasurementApp.Feet(1.0);
+            var q1 = new Quantity(1.0, Unit.FEET);
+            var q2 = new Quantity(2.0, Unit.FEET);
 
-            Assert.IsTrue(f1.Equals(f1),
-                "Object should be equal to itself (reflexive)");
+            Assert.IsFalse(q1.Equals(q2));
         }
-        [TestClass]
-    public class InchesEqualityTests
+
+        [TestMethod]
+        public void testEquality_InchToInch_DifferentValue()
+        {
+            var q1 = new Quantity(1.0, Unit.INCH);
+            var q2 = new Quantity(2.0, Unit.INCH);
+
+            Assert.IsFalse(q1.Equals(q2));
+        }
+
+        [TestMethod]
+public void testEquality_InvalidUnit()
+{
+    try
     {
-        [TestMethod]
-        public void TestInchesEquality_SameValue()
-        {
-            var inch1 = new QuantityMeasurementApp.Inches(1.0);
-            var inch2 = new QuantityMeasurementApp.Inches(1.0);
-
-            Assert.IsTrue(inch1.Equals(inch2));
-        }
-
-        [TestMethod]
-        public void TestInchesEquality_DifferentValue()
-        {
-            var inch1 = new QuantityMeasurementApp.Inches(1.0);
-            var inch2 = new QuantityMeasurementApp.Inches(2.0);
-
-            Assert.IsFalse(inch1.Equals(inch2));
-        }
-
-        [TestMethod]
-        public void TestInchesEquality_NullComparison()
-        {
-            var inch = new QuantityMeasurementApp.Inches(1.0);
-
-            Assert.IsFalse(inch.Equals(null));
-        }
-
-        [TestMethod]
-        public void TestInchesEquality_DifferentClass()
-        {
-            var inch = new QuantityMeasurementApp.Inches(1.0);
-
-            Assert.IsFalse(inch.Equals("Invalid Type"));
-        }
-
-        [TestMethod]
-        public void TestInchesEquality_SameReference()
-        {
-            var inch = new QuantityMeasurementApp.Inches(1.0);
-
-            Assert.IsTrue(inch.Equals(inch));
-        }
+        new Quantity(1.0, (Unit)999);
+        Assert.Fail("Expected ArgumentException was not thrown.");
     }
+    catch (ArgumentException)
+    {
+    }
+}
+
+        [TestMethod]
+        public void testEquality_SameReference()
+        {
+            var q = new Quantity(1.0, Unit.FEET);
+            Assert.IsTrue(q.Equals(q));
+        }
+
+        [TestMethod]
+        public void testEquality_NullComparison()
+        {
+            var q = new Quantity(1.0, Unit.FEET);
+            Assert.IsFalse(q.Equals(null));
+        }
+
+        [TestMethod]
+    public void testEquality_NullUnit()
+   {
+    try
+    {
+        new Quantity(1.0, (Unit)999);
+        Assert.Fail("Expected ArgumentException was not thrown.");
+    }
+    catch (ArgumentException)
+    {
+        
+    }
+}
     }
 }
