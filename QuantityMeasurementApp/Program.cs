@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using QuantityMeasurementApp.Model;
 
 namespace QuantityMeasurementApp
@@ -9,42 +9,31 @@ namespace QuantityMeasurementApp
         {
             try
             {
-                Console.WriteLine("Enter First Quantity");
-
-                Console.Write("Value: ");
+                Console.WriteLine("Enter first value:");
                 double value1 = Convert.ToDouble(Console.ReadLine());
 
-                Console.Write("Unit (Feet, Inches, Yards, Centimeters): ");
-                Unit unit1 = ParseUnit(Console.ReadLine());
+                Console.WriteLine("Enter first unit (FEET / INCH / YARD / CENTIMETER):");
+                Unit unit1 = (Unit)Enum.Parse(typeof(Unit), Console.ReadLine().ToUpper());
 
-                var quantity1 = new Quantity(value1, unit1);
-
-                Console.WriteLine("\nEnter Second Quantity");
-
-                Console.Write("Value: ");
+                Console.WriteLine("Enter second value:");
                 double value2 = Convert.ToDouble(Console.ReadLine());
 
-                Console.Write("Unit (Feet, Inches, Yards, Centimeters): ");
-                Unit unit2 = ParseUnit(Console.ReadLine());
+                Console.WriteLine("Enter second unit (FEET / INCH / YARD / CENTIMETER):");
+                Unit unit2 = (Unit)Enum.Parse(typeof(Unit), Console.ReadLine().ToUpper());
 
-                var quantity2 = new Quantity(value2, unit2);
+                Quantity q1 = new Quantity(value1, unit1);
+                Quantity q2 = new Quantity(value2, unit2);
 
-                bool result = quantity1.Equals(quantity2);
+                Quantity result = q1.Add(q2);
 
-                Console.WriteLine($"\nAre they equal? {result}");
+                Console.WriteLine($"Result: {result.Value} {result.Unit}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                Console.WriteLine("Error: " + ex.Message);
             }
-        }
 
-        private static Unit ParseUnit(string input)
-        {
-            if (Enum.TryParse(typeof(Unit), input, true, out object unit))
-                return (Unit)unit;
-
-            throw new ArgumentException("Invalid unit entered.");
+            Console.ReadLine();
         }
     }
 }

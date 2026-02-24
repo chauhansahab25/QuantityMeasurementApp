@@ -1,61 +1,107 @@
 using System;
-using System.Collections.Generic;
 
-namespace QuantityMeasurementApp.Model
+namespace QuantityMeasurementApp.Model;
+
+public class Quantity
 {
-    public class Quantity
+    private readonly double value;
+    private readonly Unit unit;
+
+    public double Value => value;
+    public Unit Unit => unit;
+    public Quantity(double value, Unit unit)
     {
-        public double Value { get; }
-        public Unit Unit { get; }
+        if (Double.IsNaN(value) || Double.IsInfinity(value))
+            throw new ArgumentException("Value must be finite number.");
+        this.value = value;
+        this.unit = unit;
+    }
 
-        private const double EPSILON = 1e-6;
+    private double ConvertToInch()
+    {
+        if (unit == Unit.FEET)
+            return value * 12;
+        if (unit == Unit.INCH)
+            return value;
+        if (unit == Unit.YARD)
+            return value * 36;
+        if (unit == Unit.CENTIMETER)
+            return value * 0.393701;
+        throw new ArgumentException("Invalid unit");
+    }
+    // Static method to convert between units
+    public static double Convert(double value, Unit source, Unit target)
+    {
+        if (source == target)
+            return value;
 
-        private static readonly Dictionary<Unit, double> conversionToFeet =
-            new Dictionary<Unit, double>
-        {
-            { Unit.FEET, 1.0 },
-            { Unit.INCH, 1.0 / 12.0 },
-            { Unit.YARD, 3.0 },
-            { Unit.CENTIMETER, 1.0 / 30.48 }
-        };
+        Quantity temp = new Quantity(value, source);
+        double valueInInch = temp.ConvertToInch();
 
-        public Quantity(double value, Unit unit)
-        {
-            if (!Enum.IsDefined(typeof(Unit), unit))
-                throw new ArgumentException("Invalid Unit");
+        if (target == Unit.FEET)
+            return valueInInch / 12;
+        if (target == Unit.INCH)
+            return valueInInch;
+        if (target == Unit.YARD)
+            return valueInInch / 36;
+        if (target == Unit.CENTIMETER)
+            return valueInInch / 0.393701;
+        throw new ArgumentException("Invalid target unit");
+    }
 
-            if (double.IsNaN(value) || double.IsInfinity(value))
-                throw new ArgumentException("Invalid numeric value");
+    
+    public Quantity Add(Quantity other)
+    {
+        if (other == null)
+            throw new ArgumentException("Second operand cannot be null");
 
-            Value = value;
-            Unit = unit;
-        }
+        double thisInInch = this.ConvertToInch();
+        double otherInInch = other.ConvertToInch();
 
-        public double ConvertTo(Unit targetUnit)
-        {
-            if (!Enum.IsDefined(typeof(Unit), targetUnit))
-                throw new ArgumentException("Invalid Target Unit");
+        double sumInInch = thisInInch + otherInInch;
 
-            double valueInFeet = Value * conversionToFeet[Unit];
+        double resultValue;
 
-            return valueInFeet / conversionToFeet[targetUnit];
-        }
+        if (this.unit == Unit.FEET)
+            resultValue = sumInInch / 12;
+        else if (this.unit == Unit.INCH)
+            resultValue = sumInInch;
+        else if (this.unit == Unit.YARD)
+            resultValue = sumInInch / 36;
+        else if (this.unit == Unit.CENTIMETER)
+            resultValue = sumInInch / 0.393701;
+        else
+            throw new ArgumentException("Invalid unit");
 
-        
-        public override bool Equals(object obj)
-        {
-            if (obj is not Quantity other)
-                return false;
+        return new Quantity(resultValue, this.unit);
+    }
+    // Static method to add two QuantityLength objects
+    public static Quantity Add(Quantity l1, Quantity l2)
+    {
+        if (l1 == null || l2 == null)
+            throw new ArgumentException("Operands cannot be null");
 
-            double thisInFeet = Value * conversionToFeet[Unit];
-            double otherInFeet = other.Value * conversionToFeet[other.Unit];
+        return l1.Add(l2);
+    }
 
-            return Math.Abs(thisInFeet - otherInFeet) < EPSILON;
-        }
 
-        public override int GetHashCode()
-        {
-            return (Value, Unit).GetHashCode();
-        }
+    public override bool Equals(object obj)
+    {
+        if (obj == null) return false;
+        if (this == obj) return true;
+        if (!(obj is Quantity)) return false;
+        Quantity other = (Quantity)obj;
+        double thisInInch = this.ConvertToInch();
+        double otherInInch = other.ConvertToInch();
+        return Math.Abs(thisInInch - otherInInch) < 0.000001;
+    }
+
+    public override int GetHashCode()
+    {
+        return ConvertToInch().GetHashCode();
+    }
+    public override string ToString()
+    {
+        return value + " " + unit;
     }
 }
