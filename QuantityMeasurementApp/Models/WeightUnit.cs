@@ -1,5 +1,3 @@
-using System;
-
 namespace QuantityMeasurementApp.Model
 {
     public enum WeightUnit
