@@ -14,6 +14,8 @@ namespace QuantityMeasurementApp.Model
                 return lengthUnit.ConvertToBaseUnit(value);
             if (unit is WeightUnit weightUnit)
                 return weightUnit.ConvertToBaseUnit(value);
+            if (unit is VolumeUnit volumeUnit)
+                return volumeUnit.ConvertToBaseUnit(value);
             throw new ArgumentException("Unsupported unit type");
         }
 
@@ -23,6 +25,8 @@ namespace QuantityMeasurementApp.Model
                 return lengthUnit.ConvertFromBaseUnit(baseValue);
             if (unit is WeightUnit weightUnit)
                 return weightUnit.ConvertFromBaseUnit(baseValue);
+            if (unit is VolumeUnit volumeUnit)
+                return volumeUnit.ConvertFromBaseUnit(baseValue);
             throw new ArgumentException("Unsupported unit type");
         }
     }

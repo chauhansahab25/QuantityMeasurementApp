@@ -9,7 +9,7 @@ namespace QuantityMeasurementApp
         {
             try
             {
-                Console.WriteLine("Select measurement type (LENGTH / WEIGHT):");
+                Console.WriteLine("Select measurement type (LENGTH / WEIGHT / VOLUME):");
                 string type = Console.ReadLine().ToUpper();
 
                 if (type == "LENGTH")
@@ -19,6 +19,10 @@ namespace QuantityMeasurementApp
                 else if (type == "WEIGHT")
                 {
                     ProcessMeasurement<WeightUnit>();
+                }
+                else if (type == "VOLUME")
+                {
+                    ProcessMeasurement<VolumeUnit>();
                 }
                 else
                 {
