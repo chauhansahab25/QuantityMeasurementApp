@@ -52,6 +52,9 @@ namespace QuantityMeasurementApp.Model
         private double PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)
         {
             ValidateArithmeticOperands(other);
+            
+            // Validate operation support for temperature
+            this.unit.ValidateOperationSupport(operation.ToString());
 
             double thisInBase = this.ConvertToBaseUnit();
             double otherInBase = other.ConvertToBaseUnit();

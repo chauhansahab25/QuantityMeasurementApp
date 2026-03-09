@@ -16,6 +16,8 @@ namespace QuantityMeasurementApp.Model
                 return weightUnit.ConvertToBaseUnit(value);
             if (unit is VolumeUnit volumeUnit)
                 return volumeUnit.ConvertToBaseUnit(value);
+            if (unit is TemperatureUnit tempUnit)
+                return tempUnit.ConvertToBaseUnit(value);
             throw new ArgumentException("Unsupported unit type");
         }
 
@@ -27,7 +29,24 @@ namespace QuantityMeasurementApp.Model
                 return weightUnit.ConvertFromBaseUnit(baseValue);
             if (unit is VolumeUnit volumeUnit)
                 return volumeUnit.ConvertFromBaseUnit(baseValue);
+            if (unit is TemperatureUnit tempUnit)
+                return tempUnit.ConvertFromBaseUnit(baseValue);
             throw new ArgumentException("Unsupported unit type");
+        }
+
+        public static bool SupportsArithmetic<T>(this T unit) where T : Enum
+        {
+            if (unit is TemperatureUnit)
+                return false;
+            return true;
+        }
+
+        public static void ValidateOperationSupport<T>(this T unit, string operation) where T : Enum
+        {
+            if (unit is TemperatureUnit)
+            {
+                throw new NotSupportedException($"Temperature does not support {operation} operation. Temperature measurements can only be compared and converted.");
+            }
         }
     }
 }

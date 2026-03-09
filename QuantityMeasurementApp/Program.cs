@@ -9,7 +9,7 @@ namespace QuantityMeasurementApp
         {
             try
             {
-                Console.WriteLine("Select measurement type (LENGTH / WEIGHT / VOLUME):");
+                Console.WriteLine("Select measurement type (LENGTH / WEIGHT / VOLUME / TEMPERATURE):");
                 string type = Console.ReadLine().ToUpper();
 
                 Console.WriteLine("Select operation (EQUALITY / CONVERSION / ADDITION / SUBTRACTION / DIVISION):");
@@ -26,6 +26,10 @@ namespace QuantityMeasurementApp
                 else if (type == "VOLUME")
                 {
                     ProcessOperation<VolumeUnit>(operation);
+                }
+                else if (type == "TEMPERATURE")
+                {
+                    ProcessOperation<TemperatureUnit>(operation);
                 }
                 else
                 {
