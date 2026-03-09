@@ -10,6 +10,13 @@ namespace QuantityMeasurementApp.Model
         public double Value => value;
         public U Unit => unit;
 
+        private enum ArithmeticOperation
+        {
+            ADD,
+            SUBTRACT,
+            DIVIDE
+        }
+
         public Quantity(double value, U unit)
         {
             if (Double.IsNaN(value) || Double.IsInfinity(value))
@@ -32,16 +39,36 @@ namespace QuantityMeasurementApp.Model
             return target.ConvertFromBaseUnit(baseValue);
         }
 
-        public Quantity<U> Add(Quantity<U> other)
+        private void ValidateArithmeticOperands(Quantity<U> other)
         {
             if (other == null)
                 throw new ArgumentException("Second operand cannot be null");
+            if (this.unit.GetType() != other.unit.GetType())
+                throw new ArgumentException("Cannot perform arithmetic on different measurement categories");
+            if (Double.IsNaN(other.value) || Double.IsInfinity(other.value))
+                throw new ArgumentException("Operand value must be finite number");
+        }
+
+        private double PerformBaseArithmetic(Quantity<U> other, ArithmeticOperation operation)
+        {
+            ValidateArithmeticOperands(other);
 
             double thisInBase = this.ConvertToBaseUnit();
             double otherInBase = other.ConvertToBaseUnit();
-            double sumInBase = thisInBase + otherInBase;
-            double resultValue = this.unit.ConvertFromBaseUnit(sumInBase);
 
+            return operation switch
+            {
+                ArithmeticOperation.ADD => thisInBase + otherInBase,
+                ArithmeticOperation.SUBTRACT => thisInBase - otherInBase,
+                ArithmeticOperation.DIVIDE => otherInBase == 0 ? throw new ArithmeticException("Cannot divide by zero") : thisInBase / otherInBase,
+                _ => throw new ArgumentException("Invalid operation")
+            };
+        }
+
+        public Quantity<U> Add(Quantity<U> other)
+        {
+            double resultInBase = PerformBaseArithmetic(other, ArithmeticOperation.ADD);
+            double resultValue = this.unit.ConvertFromBaseUnit(resultInBase);
             return new Quantity<U>(resultValue, this.unit);
         }
 
@@ -49,34 +76,19 @@ namespace QuantityMeasurementApp.Model
         {
             if (q1 == null || q2 == null)
                 throw new ArgumentException("Operands cannot be null");
-
             return q1.Add(q2);
         }
 
         public Quantity<U> Subtract(Quantity<U> other)
         {
-            if (other == null)
-                throw new ArgumentException("Second operand cannot be null");
-
-            double thisInBase = this.ConvertToBaseUnit();
-            double otherInBase = other.ConvertToBaseUnit();
-            double diffInBase = thisInBase - otherInBase;
-            double resultValue = this.unit.ConvertFromBaseUnit(diffInBase);
-
+            double resultInBase = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
+            double resultValue = this.unit.ConvertFromBaseUnit(resultInBase);
             return new Quantity<U>(resultValue, this.unit);
         }
 
         public double Divide(Quantity<U> other)
         {
-            if (other == null)
-                throw new ArgumentException("Second operand cannot be null");
-
-            double otherInBase = other.ConvertToBaseUnit();
-            if (Math.Abs(otherInBase) < 0.000001)
-                throw new ArithmeticException("Cannot divide by zero");
-
-            double thisInBase = this.ConvertToBaseUnit();
-            return thisInBase / otherInBase;
+            return PerformBaseArithmetic(other, ArithmeticOperation.DIVIDE);
         }
 
         public override bool Equals(object obj)
