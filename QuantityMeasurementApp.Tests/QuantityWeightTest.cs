@@ -188,11 +188,39 @@ namespace QuantityMeasurementApp.Tests
         }
 
         [TestMethod]
-        public void TestIncompatibility_LengthVsWeight()
+        public void TestSubtraction_SameUnit_KilogramMinusKilogram()
         {
-            Quantity length = new Quantity(1.0, Unit.FEET);
-            QuantityWeight weight = new QuantityWeight(1.0, WeightUnit.KILOGRAM);
-            Assert.IsFalse(length.Equals(weight));
+            QuantityWeight w1 = new QuantityWeight(10.0, WeightUnit.KILOGRAM);
+            QuantityWeight w2 = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+            QuantityWeight result = w1.Subtract(w2);
+            Assert.IsTrue(result.Equals(new QuantityWeight(5.0, WeightUnit.KILOGRAM)));
+        }
+
+        [TestMethod]
+        public void TestSubtraction_CrossUnit_KilogramMinusGram()
+        {
+            QuantityWeight w1 = new QuantityWeight(10.0, WeightUnit.KILOGRAM);
+            QuantityWeight w2 = new QuantityWeight(5000.0, WeightUnit.GRAM);
+            QuantityWeight result = w1.Subtract(w2);
+            Assert.IsTrue(result.Equals(new QuantityWeight(5.0, WeightUnit.KILOGRAM)));
+        }
+
+        [TestMethod]
+        public void TestDivision_SameUnit_KilogramDividedByKilogram()
+        {
+            QuantityWeight w1 = new QuantityWeight(10.0, WeightUnit.KILOGRAM);
+            QuantityWeight w2 = new QuantityWeight(5.0, WeightUnit.KILOGRAM);
+            double result = w1.Divide(w2);
+            Assert.AreEqual(2.0, result, 0.000001);
+        }
+
+        [TestMethod]
+        public void TestDivision_CrossUnit_KilogramDividedByGram()
+        {
+            QuantityWeight w1 = new QuantityWeight(2.0, WeightUnit.KILOGRAM);
+            QuantityWeight w2 = new QuantityWeight(2000.0, WeightUnit.GRAM);
+            double result = w1.Divide(w2);
+            Assert.AreEqual(1.0, result, 0.000001);
         }
     }
 }

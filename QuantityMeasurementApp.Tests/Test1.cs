@@ -213,6 +213,110 @@ namespace QuantityMeasurementApp.Tests
             Assert.IsTrue(result.Equals(new Quantity(3.0, Unit.FEET)));
         }
 
+        [TestMethod]
+        public void TestSubtraction_SameUnit_FeetMinusFeet()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            Quantity q2 = new Quantity(5.0, Unit.FEET);
+            Quantity result = q1.Subtract(q2);
+            Assert.IsTrue(result.Equals(new Quantity(5.0, Unit.FEET)));
+        }
 
+        [TestMethod]
+        public void TestSubtraction_CrossUnit_FeetMinusInches()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            Quantity q2 = new Quantity(6.0, Unit.INCH);
+            Quantity result = q1.Subtract(q2);
+            Assert.IsTrue(result.Equals(new Quantity(9.5, Unit.FEET)));
+        }
+
+        [TestMethod]
+        public void TestSubtraction_ResultingInNegative()
+        {
+            Quantity q1 = new Quantity(5.0, Unit.FEET);
+            Quantity q2 = new Quantity(10.0, Unit.FEET);
+            Quantity result = q1.Subtract(q2);
+            Assert.IsTrue(result.Equals(new Quantity(-5.0, Unit.FEET)));
+        }
+
+        [TestMethod]
+        public void TestSubtraction_ResultingInZero()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            Quantity q2 = new Quantity(120.0, Unit.INCH);
+            Quantity result = q1.Subtract(q2);
+            Assert.IsTrue(result.Equals(new Quantity(0.0, Unit.FEET)));
+        }
+
+        [TestMethod]
+        public void TestSubtraction_NullOperand()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            try
+            {
+                q1.Subtract(null);
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+            }
+        }
+
+        [TestMethod]
+        public void TestDivision_SameUnit_FeetDividedByFeet()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            Quantity q2 = new Quantity(2.0, Unit.FEET);
+            double result = q1.Divide(q2);
+            Assert.AreEqual(5.0, result, 0.000001);
+        }
+
+        [TestMethod]
+        public void TestDivision_CrossUnit_FeetDividedByInches()
+        {
+            Quantity q1 = new Quantity(24.0, Unit.INCH);
+            Quantity q2 = new Quantity(2.0, Unit.FEET);
+            double result = q1.Divide(q2);
+            Assert.AreEqual(1.0, result, 0.000001);
+        }
+
+        [TestMethod]
+        public void TestDivision_RatioLessThanOne()
+        {
+            Quantity q1 = new Quantity(5.0, Unit.FEET);
+            Quantity q2 = new Quantity(10.0, Unit.FEET);
+            double result = q1.Divide(q2);
+            Assert.AreEqual(0.5, result, 0.000001);
+        }
+
+        [TestMethod]
+        public void TestDivision_ByZero()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            Quantity q2 = new Quantity(0.0, Unit.FEET);
+            try
+            {
+                q1.Divide(q2);
+                Assert.Fail("Expected ArithmeticException was not thrown.");
+            }
+            catch (ArithmeticException)
+            {
+            }
+        }
+
+        [TestMethod]
+        public void TestDivision_NullOperand()
+        {
+            Quantity q1 = new Quantity(10.0, Unit.FEET);
+            try
+            {
+                q1.Divide(null);
+                Assert.Fail("Expected ArgumentException was not thrown.");
+            }
+            catch (ArgumentException)
+            {
+            }
+        }
     }
 }

@@ -53,6 +53,32 @@ namespace QuantityMeasurementApp.Model
             return q1.Add(q2);
         }
 
+        public Quantity<U> Subtract(Quantity<U> other)
+        {
+            if (other == null)
+                throw new ArgumentException("Second operand cannot be null");
+
+            double thisInBase = this.ConvertToBaseUnit();
+            double otherInBase = other.ConvertToBaseUnit();
+            double diffInBase = thisInBase - otherInBase;
+            double resultValue = this.unit.ConvertFromBaseUnit(diffInBase);
+
+            return new Quantity<U>(resultValue, this.unit);
+        }
+
+        public double Divide(Quantity<U> other)
+        {
+            if (other == null)
+                throw new ArgumentException("Second operand cannot be null");
+
+            double otherInBase = other.ConvertToBaseUnit();
+            if (Math.Abs(otherInBase) < 0.000001)
+                throw new ArithmeticException("Cannot divide by zero");
+
+            double thisInBase = this.ConvertToBaseUnit();
+            return thisInBase / otherInBase;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj == null) return false;

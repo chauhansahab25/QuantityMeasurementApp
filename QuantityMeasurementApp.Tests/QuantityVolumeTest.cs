@@ -211,5 +211,41 @@ namespace QuantityMeasurementApp.Tests
             {
             }
         }
+
+        [TestMethod]
+        public void TestSubtraction_SameUnit_LitreMinusLitre()
+        {
+            Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(10.0, VolumeUnit.LITRE);
+            Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(3.0, VolumeUnit.LITRE);
+            Quantity<VolumeUnit> result = v1.Subtract(v2);
+            Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(7.0, VolumeUnit.LITRE)));
+        }
+
+        [TestMethod]
+        public void TestSubtraction_CrossUnit_LitreMinusMillilitre()
+        {
+            Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
+            Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(500.0, VolumeUnit.MILLILITRE);
+            Quantity<VolumeUnit> result = v1.Subtract(v2);
+            Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(4.5, VolumeUnit.LITRE)));
+        }
+
+        [TestMethod]
+        public void TestDivision_SameUnit_LitreDividedByLitre()
+        {
+            Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(10.0, VolumeUnit.LITRE);
+            Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
+            double result = v1.Divide(v2);
+            Assert.AreEqual(2.0, result, 0.000001);
+        }
+
+        [TestMethod]
+        public void TestDivision_CrossUnit_MillilitreDividedByLitre()
+        {
+            Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MILLILITRE);
+            Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
+            double result = v1.Divide(v2);
+            Assert.AreEqual(1.0, result, 0.000001);
+        }
     }
 }

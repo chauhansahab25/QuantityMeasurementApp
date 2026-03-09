@@ -19,4 +19,10 @@ public class Quantity : Quantity<Unit>
         var result = Quantity<Unit>.Add(l1, l2);
         return new Quantity(result.Value, result.Unit);
     }
+
+    public Quantity Subtract(Quantity other)
+    {
+        var result = base.Subtract(other);
+        return new Quantity(result.Value, result.Unit);
+    }
 }

@@ -19,5 +19,11 @@ namespace QuantityMeasurementApp.Model
             var result = Quantity<WeightUnit>.Add(w1, w2);
             return new QuantityWeight(result.Value, result.Unit);
         }
+
+        public QuantityWeight Subtract(QuantityWeight other)
+        {
+            var result = base.Subtract(other);
+            return new QuantityWeight(result.Value, result.Unit);
+        }
     }
 }
