@@ -1,5 +1,6 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Model;
+using QuantityMeasurementModelLayer.Enums;
 using System;
 
 namespace QuantityMeasurementApp.Tests
@@ -81,7 +82,7 @@ namespace QuantityMeasurementApp.Tests
         public void TestEquality_VolumeVsLength_Incompatible()
         {
             Quantity<VolumeUnit> volume = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
-            Quantity length = new Quantity(1.0, Unit.FEET);
+            Quantity<LengthUnit> length = new Quantity<LengthUnit>(1.0, LengthUnit.FEET);
             Assert.IsFalse(volume.Equals(length));
         }
 
@@ -149,7 +150,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(2.0, VolumeUnit.LITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.LITRE);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(3.0, VolumeUnit.LITRE)));
         }
 
@@ -158,7 +159,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MILLILITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.LITRE);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(2.0, VolumeUnit.LITRE)));
         }
 
@@ -167,7 +168,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1000.0, VolumeUnit.MILLILITRE);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.MILLILITRE);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(2000.0, VolumeUnit.MILLILITRE)));
         }
 
@@ -176,7 +177,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.GALLON);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(3.78541, VolumeUnit.LITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.GALLON);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(2.0, VolumeUnit.GALLON)));
         }
 
@@ -185,7 +186,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(0.0, VolumeUnit.MILLILITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.LITRE);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE)));
         }
 
@@ -194,7 +195,7 @@ namespace QuantityMeasurementApp.Tests
         {
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(5.0, VolumeUnit.LITRE);
             Quantity<VolumeUnit> v2 = new Quantity<VolumeUnit>(-2.0, VolumeUnit.LITRE);
-            Quantity<VolumeUnit> result = v1.Add(v2);
+            Quantity<VolumeUnit> result = v1.Add(v2, VolumeUnit.LITRE);
             Assert.IsTrue(result.Equals(new Quantity<VolumeUnit>(3.0, VolumeUnit.LITRE)));
         }
 
@@ -204,7 +205,7 @@ namespace QuantityMeasurementApp.Tests
             Quantity<VolumeUnit> v1 = new Quantity<VolumeUnit>(1.0, VolumeUnit.LITRE);
             try
             {
-                v1.Add(null);
+                v1.Add(null, VolumeUnit.LITRE);
                 Assert.Fail("Expected ArgumentException was not thrown.");
             }
             catch (ArgumentException)

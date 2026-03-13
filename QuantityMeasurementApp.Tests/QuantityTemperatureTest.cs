@@ -1,5 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Model;
+using QuantityMeasurementModelLayer.Enums;
+using QuantityMeasurementModelLayer.Exceptions;
 using System;
 
 namespace QuantityMeasurementApp.Tests
@@ -73,7 +75,7 @@ namespace QuantityMeasurementApp.Tests
         public void TestEquality_TemperatureVsLength_Incompatible()
         {
             Quantity<TemperatureUnit> temp = new Quantity<TemperatureUnit>(100.0, TemperatureUnit.CELSIUS);
-            Quantity length = new Quantity(100.0, Unit.FEET);
+            Quantity<LengthUnit> length = new Quantity<LengthUnit>(100.0, LengthUnit.FEET);
             Assert.IsFalse(temp.Equals(length));
         }
 
@@ -122,10 +124,10 @@ namespace QuantityMeasurementApp.Tests
             Quantity<TemperatureUnit> t2 = new Quantity<TemperatureUnit>(50.0, TemperatureUnit.CELSIUS);
             try
             {
-                t1.Add(t2);
-                Assert.Fail("Expected NotSupportedException was not thrown.");
+                t1.Add(t2, TemperatureUnit.CELSIUS);
+                Assert.Fail("Expected UnsupportedOperationException was not thrown.");
             }
-            catch (NotSupportedException ex)
+            catch (UnsupportedOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("Temperature does not support"));
             }
@@ -139,9 +141,9 @@ namespace QuantityMeasurementApp.Tests
             try
             {
                 t1.Subtract(t2);
-                Assert.Fail("Expected NotSupportedException was not thrown.");
+                Assert.Fail("Expected UnsupportedOperationException was not thrown.");
             }
-            catch (NotSupportedException ex)
+            catch (UnsupportedOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("Temperature does not support"));
             }
@@ -155,9 +157,9 @@ namespace QuantityMeasurementApp.Tests
             try
             {
                 t1.Divide(t2);
-                Assert.Fail("Expected NotSupportedException was not thrown.");
+                Assert.Fail("Expected UnsupportedOperationException was not thrown.");
             }
-            catch (NotSupportedException ex)
+            catch (UnsupportedOperationException ex)
             {
                 Assert.IsTrue(ex.Message.Contains("Temperature does not support"));
             }
