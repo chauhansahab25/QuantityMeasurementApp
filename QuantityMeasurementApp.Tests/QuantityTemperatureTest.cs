@@ -2,6 +2,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using QuantityMeasurementApp.Model;
 using QuantityMeasurementModelLayer.Enums;
 using QuantityMeasurementModelLayer.Exceptions;
+using QuantityMeasurementModelLayer.Models;
+using QuantityMeasurementModelLayer.Extensions;
 using System;
 
 namespace QuantityMeasurementApp.Tests

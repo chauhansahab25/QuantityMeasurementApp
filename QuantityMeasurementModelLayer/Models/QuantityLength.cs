@@ -1,5 +1,8 @@
 using System;
 using QuantityMeasurementModelLayer.Enums;
+using QuantityMeasurementModelLayer.Models;
+using QuantityMeasurementModelLayer.Extensions;
+
 namespace QuantityMeasurementApp.Model;
     public class QuantityLength
     {

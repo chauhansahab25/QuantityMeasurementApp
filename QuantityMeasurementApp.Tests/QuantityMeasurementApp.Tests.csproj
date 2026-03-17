@@ -1,23 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSTest" Version="4.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.0" />
+    <PackageReference Include="MSTest" Version="3.6.3" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
   </ItemGroup>
+  <ItemGroup>
+  <None Include="appsettings.json">
+    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\QuantityMeasurementModelLayer\QuantityMeasurementModelLayer.csproj" />
     <ProjectReference Include="..\QuantityMeasurementBusinessLayer\QuantityMeasurementBusinessLayer.csproj" />
+    <ProjectReference Include="..\QuantityMeasurementRepositoryLayer\QuantityMeasurementRepositoryLayer.csproj" />
   </ItemGroup>
 
 </Project>

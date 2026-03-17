@@ -1,7 +1,8 @@
-namespace QuantityMeasurementApp.Model;
-    internal enum ArithmeticOperation
-    {
-        ADD,
-        SUBTRACT,
-        DIVIDE
-    }
+namespace QuantityMeasurementModelLayer.Models;
+
+public enum ArithmeticOperation
+{
+    ADD,
+    SUBTRACT,
+    DIVIDE
+}

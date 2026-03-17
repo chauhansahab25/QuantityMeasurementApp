@@ -1,82 +1,196 @@
 using System;
-using Microsoft.Extensions.DependencyInjection;
 using QuantityMeasurementBusinessLayer.Interfaces;
 using QuantityMeasurementBusinessLayer.Services;
+using QuantityMeasurementModelLayer.DTO;
 using QuantityMeasurementRepositoryLayer.Interfaces;
 using QuantityMeasurementRepositoryLayer.Repositories;
-using QuantityMeasurementModelLayer.DTO;
-using QuantityMeasurementConsoleApp.Interface;
+using QuantityMeasurementRepositoryLayer.Services;
+using QuantityMeasurementConsoleApp.Interfaces;
+using Microsoft.Extensions.Configuration;
+
+namespace QuantityMeasurementConsoleApp.Services;
 
 public class Menu : IMenu
 {
-    private readonly IQuantityMeasurementService service;
+    private readonly IConfiguration config;
+    private IQuantityMeasurementService? service;
+    private IQuantityMeasurementRepository? repository;
+    private IQuantityMeasurementRepository? databaseRepository;
+    private DataSyncService? syncService;
+    private bool isUsingCache;
 
-    public Menu()
+    public Menu(IConfiguration config)
     {
-        this.service = ConfigureServices();
-    }
-
-    public Menu(IQuantityMeasurementService service)
-    {
-        this.service = service;
-    }
-
-    private IQuantityMeasurementService ConfigureServices()
-    {
-        var provider = new ServiceCollection()
-            .AddSingleton<IQuantityMeasurementRepository, QuantityMeasurementCacheRepository>()
-            .AddScoped<IQuantityMeasurementService, QuantityMeasurementServiceImpl>()
-            .BuildServiceProvider();
-
-        var service = provider.GetService<IQuantityMeasurementService>();
-        if (service == null)
-        {
-            throw new InvalidOperationException("Failed to configure IQuantityMeasurementService");
-        }
-        
-        return service;
+        this.config = config;
     }
 
     public void Start()
     {
+        // Storage selection logic
+        SelectStorage();
+        
+        // Main application loop
         while (true)
         {
             try
             {
-                ClearScreen();
-                DisplayMainMenu();
-                int type = GetUserChoice();
+                Console.WriteLine("\n===== Quantity Measurement System =====");
+                Console.WriteLine("1 Length");
+                Console.WriteLine("2 Volume");
+                Console.WriteLine("3 Weight");
+                Console.WriteLine("4 Temperature");
+                Console.WriteLine("5 Show Records");
+                Console.WriteLine("6 Exit");
+
+                Console.Write("Enter choice: ");
+                int type = Convert.ToInt32(Console.ReadLine());
+
+                if (type == 6) return;
 
                 if (type == 5)
-                    return;
+                {
+                    ShowAllData();
+                    continue;
+                }
 
-                ProcessMeasurementType(type);
+                OperationMenu(type);
             }
             catch (Exception ex)
             {
-                DisplayError(ex.Message);
-                WaitForUserInput();
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
     }
 
-    // IMenu Interface Implementation
-    public void DisplayMainMenu()
+    private void SelectStorage()
     {
-        Console.WriteLine("\n===== Quantity Measurement System =====");
-        DisplayMeasurementTypeMenu();
+        Console.WriteLine("\n=== Checking Database Connectivity ===");
+        
+        // First check if database is available
+        bool isDatabaseAvailable = CheckDatabaseConnectivity();
+        
+        if (!isDatabaseAvailable)
+        {
+            Console.WriteLine("❌ Database is not available. Using Cache Memory until database becomes active.");
+            
+            repository = new QuantityMeasurementCacheRepository();
+            isUsingCache = true;
+            service = new QuantityMeasurementServiceImpl(repository);
+            return;
+        }
+        
+        Console.WriteLine("✅ Database is available!");
+        
+        // Check if there's pending JSON data to upload
+        CheckAndUploadPendingJsonData();
+        
+        Console.WriteLine("\n=== Storage Selection ===");
+        Console.WriteLine("Choose your preferred storage method:");
+        Console.WriteLine();
+        Console.WriteLine("1. Cache Memory (Fast, In-Memory Storage with JSON Persistence)");
+        Console.WriteLine();
+        Console.WriteLine("2. Database (Persistent SQL Server Storage)");
+        Console.WriteLine();
+        
+        while (true)
+        {
+            Console.Write("Enter your choice (1 for Cache, 2 for Database): ");
+            string input = Console.ReadLine();
+            input = input?.Trim() ?? string.Empty;
+            
+            switch (input)
+            {
+                case "1":
+                    Console.WriteLine("\n✓ Cache Memory selected - Using in-memory storage with JSON persistence");
+                    repository = new QuantityMeasurementCacheRepository();
+                    isUsingCache = true;
+                    break;
+                    
+                case "2":
+                    Console.WriteLine("\n✓ Database selected - Using SQL Server persistent storage");
+                    repository = new QuantityMeasurementDatabaseRepository(config);
+                    isUsingCache = false;
+                    break;
+                    
+                default:
+                    Console.WriteLine("Invalid choice. Please enter 1 or 2.");
+                    continue;
+            }
+
+            service = new QuantityMeasurementServiceImpl(repository);
+            
+            // Create database repository for sync service if using cache
+            if (isUsingCache)
+            {
+                // Reuse the same database repository instance if already created for database option
+                if (databaseRepository == null)
+                {
+                    databaseRepository = new QuantityMeasurementDatabaseRepository(config);
+                }
+                syncService = new DataSyncService((ICacheRepository)repository, databaseRepository);
+            }
+            
+            break;
+        }
     }
 
-    public void DisplayMeasurementTypeMenu()
+    private void CheckAndUploadPendingJsonData()
     {
-        Console.WriteLine("1 Length");
-        Console.WriteLine("2 Volume");
-        Console.WriteLine("3 Weight");
-        Console.WriteLine("4 Temperature");
-        Console.WriteLine("5 Exit");
+        try
+        {
+            // Create temporary cache repository to check for pending data
+            var tempCacheRepo = new QuantityMeasurementCacheRepository();
+            
+            if (tempCacheRepo.HasPendingData())
+            {
+                Console.WriteLine("\n📝 Found pending data in JSON file from previous session.");                
+                // Use existing database repository if available, create only if needed
+                if (databaseRepository == null)
+                {
+                    databaseRepository = new QuantityMeasurementDatabaseRepository(config);
+                }
+                var tempSyncService = new DataSyncService(tempCacheRepo, databaseRepository);
+                
+                bool success = tempSyncService.UploadPendingDataToDatabase(silent: false);
+                
+                if (success)
+                {
+                    Console.WriteLine("✅ Pending data uploaded to database!\n");
+                }
+                else
+                {
+                    Console.WriteLine("⚠️ Failed to upload pending data. Data remains in JSON file.\n");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Error checking pending data: {ex.Message}\n");
+        }
     }
 
-    public void DisplayOperationMenu()
+    private bool CheckDatabaseConnectivity()
+    {
+        try
+        {
+            Console.WriteLine("Testing database connection...");
+            // Use existing database repository if available, create only if needed
+            if (databaseRepository == null)
+            {
+                databaseRepository = new QuantityMeasurementDatabaseRepository(config);
+            }
+            bool isConnected = databaseRepository.TestConnection();
+            return isConnected;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Database connectivity check failed: {ex.Message}");
+            return false;
+        }
+    }
+
+    // -------- OPERATION MENU --------
+    private void OperationMenu(int type)
     {
         Console.WriteLine("\nSelect Operation");
         Console.WriteLine("1 Add");
@@ -84,90 +198,62 @@ public class Menu : IMenu
         Console.WriteLine("3 Divide");
         Console.WriteLine("4 Compare");
         Console.WriteLine("5 Convert");
-    }
 
-    public int GetUserChoice()
-    {
-        Console.Write("Enter choice: ");
-        return Convert.ToInt32(Console.ReadLine());
-    }
+        Console.Write("Enter Operation: ");
+        int operation = Convert.ToInt32(Console.ReadLine());
 
-    public void DisplayResult(string result)
-    {
-        Console.WriteLine($"\nResult = {result}");
-    }
-
-    public void DisplayError(string error)
-    {
-        Console.WriteLine($"Error: {error}");
-    }
-
-    public void WaitForUserInput()
-    {
-        Console.WriteLine("Press any key to continue...");
-        Console.ReadKey();
-    }
-
-    public void ClearScreen()
-    {
-        Console.Clear();
-    }
-
-    // -------- BUSINESS LOGIC --------
-
-    private void ProcessMeasurementType(int type)
-    {
-        DisplayOperationMenu();
-        int operation = GetOperationChoice();
-
-        QuantityDTO q1 = GetQuantity(type);
+        QuantityDTO firstValue = GetQuantity(type);
 
         if (operation == 5)
         {
-            ConvertUnit(q1, type);
+            ConvertUnit(firstValue, type);
             return;
         }
 
-        QuantityDTO q2 = GetQuantity(type);
+        QuantityDTO secondValue = GetQuantity(type);
 
         switch (operation)
         {
             case 1:
-                var addResult = service.Add(q1, q2);
-                DisplayResult($"{addResult.Value} {addResult.Unit}");
+                if (service != null)
+                {
+                    PrintResult(service.Add(firstValue, secondValue));
+                    AutoUploadToDatabase();
+                }
                 break;
 
             case 2:
-                var subtractResult = service.Subtract(q1, q2);
-                DisplayResult($"{subtractResult.Value} {subtractResult.Unit}");
+                if (service != null)
+                {
+                    PrintResult(service.Subtract(firstValue, secondValue));
+                    AutoUploadToDatabase();
+                }
                 break;
 
             case 3:
-                double divideResult = service.Divide(q1, q2);
-                DisplayResult(divideResult.ToString());
+                if (service != null)
+                {
+                    double result = service.Divide(firstValue, secondValue);
+                    Console.WriteLine("Result = " + result);
+                    AutoUploadToDatabase();
+                }
                 break;
 
             case 4:
-                bool compareResult = service.Compare(q1, q2);
-                DisplayResult($"Are Equal = {compareResult}");
+                if (service != null)
+                {
+                    Console.WriteLine("Are Equal = " + service.Compare(firstValue, secondValue));
+                    AutoUploadToDatabase();
+                }
                 break;
 
             default:
-                DisplayError("Invalid Operation");
+                Console.WriteLine("Invalid Operation");
                 break;
         }
-        
-        WaitForUserInput();
-    }
-
-    private int GetOperationChoice()
-    {
-        Console.Write("Enter Operation: ");
-        return Convert.ToInt32(Console.ReadLine());
     }
 
     // -------- INPUT --------
-
     private QuantityDTO GetQuantity(int type)
     {
         Console.Write("\nEnter Value: ");
@@ -179,7 +265,6 @@ public class Menu : IMenu
     }
 
     // -------- UNIT MENU --------
-
     private string SelectUnit(int type)
     {
         Console.WriteLine("Select Unit");
@@ -202,6 +287,7 @@ public class Menu : IMenu
                 _ => "FEET"
             };
         }
+
         else if (type == 2) // Volume
         {
             Console.WriteLine("1 LITRE");
@@ -218,6 +304,7 @@ public class Menu : IMenu
                 _ => "LITRE"
             };
         }
+
         else if (type == 3) // Weight
         {
             Console.WriteLine("1 KILOGRAM");
@@ -234,6 +321,7 @@ public class Menu : IMenu
                 _ => "KILOGRAM"
             };
         }
+
         else // Temperature
         {
             Console.WriteLine("1 CELSIUS");
@@ -251,12 +339,78 @@ public class Menu : IMenu
     }
 
     // -------- CONVERT --------
-
-    private void ConvertUnit(QuantityDTO q1, int type)
+    private void ConvertUnit(QuantityDTO firstValue, int type)
     {
         Console.WriteLine("\nSelect Target Unit");
+
         string targetUnit = SelectUnit(type);
-        QuantityDTO result = service.Convert(q1, targetUnit);
-        DisplayResult($"{result.Value} {result.Unit}");
+
+        if (service != null)
+        {
+            QuantityDTO result = service.Convert(firstValue, targetUnit);
+            PrintResult(result);
+            AutoUploadToDatabase();
+        }
+    }
+
+    // -------- OUTPUT --------
+    private void PrintResult(QuantityDTO result)
+    {
+        Console.WriteLine($"\nResult = {result.Value} {result.Unit}");
+    }
+
+    // -------- SHOW DATABASE / CACHE RECORDS --------
+    private void ShowAllData()
+    {
+        if (repository != null)
+        {
+            var list = repository.GetAll();
+
+            Console.WriteLine("\n===== STORED RECORDS =====");
+
+            foreach (var item in list)
+            {
+                Console.WriteLine(
+                    $"Id: {item.Id} | " +
+                    $"FirstValue: {item.FirstValue} {item.FirstUnit} | " +
+                    $"SecondValue: {item.SecondValue} {item.SecondUnit} | " +
+                    $"Operation: {item.Operation} | " +
+                    $"Result: {item.Result} | " +
+                    $"Type: {item.MeasurementType}"
+                );
+            }
+
+            Console.WriteLine("==========================\n");
+        }
+    }
+
+    private void AutoUploadToDatabase()
+    {
+        if (!isUsingCache || syncService == null) return;
+        
+        var cacheRepo = (ICacheRepository)repository!;
+        
+        if (!cacheRepo.HasPendingData()) return;
+
+        try
+        {
+            // Check database connectivity before attempting upload
+            if (!CheckDatabaseConnectivity())
+            {
+                Console.WriteLine("⚠️ Database not available");
+                return;
+            }
+            
+            bool success = syncService.UploadPendingDataToDatabase(silent: true);
+            
+            if (success)
+            {
+                Console.WriteLine("✅ Data automatically uploaded to database");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️ Auto-upload failed: {ex.Message}");
+        }
     }
 }
