@@ -11,9 +11,6 @@ public class WeightService
 
     public static double Convert(double value, WeightUnit fromUnit, WeightUnit toUnit)
     {
-        if (fromUnit == null || toUnit == null)
-            throw new ArgumentException("Units cannot be null");
-
         if (double.IsNaN(value) || double.IsInfinity(value))
             throw new ArgumentException("Invalid value");
 

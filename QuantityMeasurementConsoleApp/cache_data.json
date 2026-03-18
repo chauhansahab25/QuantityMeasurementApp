@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "Id": 0,
+    "FirstValue": 34,
+    "FirstUnit": "KILOGRAM",
+    "SecondValue": 23,
+    "SecondUnit": "POUND",
+    "Operation": "COMPARE",
+    "Result": 0,
+    "MeasurementType": "Measurement"
+  }
+]

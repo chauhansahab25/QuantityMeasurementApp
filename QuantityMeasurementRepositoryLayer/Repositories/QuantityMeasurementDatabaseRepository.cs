@@ -21,7 +21,7 @@ namespace QuantityMeasurementRepositoryLayer.Repositories
             {
                 ResetIdentity();
             }
-            catch (Exception ex)
+            catch
             {
             }
         }

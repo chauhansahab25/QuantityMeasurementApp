@@ -16,7 +16,7 @@ public class QuantityVolume
         Unit = unit;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || !(obj is QuantityVolume))
             return false;
@@ -27,6 +27,12 @@ public class QuantityVolume
         double v2 = other.ConvertTo(VolumeUnit.LITRE).Value;
 
         return Math.Abs(v1 - v2) < 0.0001;
+    }
+
+    public override int GetHashCode()
+    {
+        double baseValue = ConvertTo(VolumeUnit.LITRE).Value;
+        return baseValue.GetHashCode();
     }
 
     public QuantityVolume ConvertTo(VolumeUnit target)
@@ -67,7 +73,7 @@ public QuantityVolume Subtract(QuantityVolume other)
 {
     double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-    double result = Unit.ToBaseUnit();
+    double result = resultBase / Unit.ToBaseUnit();
 
     return new QuantityVolume(result, Unit);
 }
@@ -90,7 +96,7 @@ public QuantityVolume Subtract(QuantityVolume other)
 {
     double resultBase = PerformBaseArithmetic(other, ArithmeticOperation.SUBTRACT);
 
-    double result = targetUnit.ToBaseUnit();
+    double result = resultBase / targetUnit.ToBaseUnit();
 
     return new QuantityVolume(result, targetUnit);
 }
