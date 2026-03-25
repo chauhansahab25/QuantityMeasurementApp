@@ -19,7 +19,7 @@ public class QuantityWeight
         Unit = unit;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null) return false;
         if (GetType() != obj.GetType()) return false;
@@ -44,9 +44,6 @@ public class QuantityWeight
     // Static method for backward compatibility - delegates to WeightService
     public static double Convert(double value, WeightUnit fromUnit, WeightUnit toUnit)
     {
-        if (fromUnit == null || toUnit == null)
-            throw new ArgumentException("Units cannot be null");
-
         if (double.IsNaN(value) || double.IsInfinity(value))
             throw new ArgumentException("Invalid value");
 
@@ -124,9 +121,6 @@ public class QuantityWeight
     // ConvertTo method for backward compatibility
     public QuantityWeight ConvertTo(WeightUnit targetUnit)
     {
-        if (targetUnit == null)
-            throw new ArgumentException("Target unit cannot be null");
-
         double baseValue = Unit.ConvertToBaseUnit(Value);
         double convertedValue = targetUnit.ConvertFromBaseUnit(baseValue);
         

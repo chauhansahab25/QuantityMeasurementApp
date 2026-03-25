@@ -18,7 +18,7 @@ public class Quantity<U> where U : struct
         this.unit = unit;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj == null || !(obj is Quantity<U>))
             return false;
@@ -40,7 +40,7 @@ public class Quantity<U> where U : struct
             return w.ConvertToBaseUnit(value);
 
         if (unit is VolumeUnit v)
-            return v.ToBaseUnit();
+            return v.ConvertToBaseUnit(value);
 
         if (unit is TemperatureUnit t)
             return t.ConvertToBaseUnit(value);
@@ -65,7 +65,7 @@ public class Quantity<U> where U : struct
         else if (targetUnit is WeightUnit w)
             converted = w.ConvertFromBaseUnit(baseValue);
         else if (targetUnit is VolumeUnit v)
-            converted = v.ToBaseUnit();
+            converted = v.ConvertFromBaseUnit(baseValue);
         else if (targetUnit is TemperatureUnit t)
             converted = t.ConvertFromBaseUnit(baseValue);
         else
@@ -87,7 +87,7 @@ public class Quantity<U> where U : struct
         else if (fromUnit is WeightUnit w1)
             baseValue = w1.ConvertToBaseUnit(value);
         else if (fromUnit is VolumeUnit v1)
-            baseValue = v1.ToBaseUnit();
+            baseValue = v1.ConvertToBaseUnit(value);
         else if (fromUnit is TemperatureUnit t1)
             baseValue = t1.ConvertToBaseUnit(value);
         else
@@ -99,7 +99,7 @@ public class Quantity<U> where U : struct
         else if (toUnit is WeightUnit w2)
             return w2.ConvertFromBaseUnit(baseValue);
         else if (toUnit is VolumeUnit v2)
-            return v2.FromBaseUnit(baseValue);
+            return v2.ConvertFromBaseUnit(baseValue);
         else if (toUnit is TemperatureUnit t2)
             return t2.ConvertFromBaseUnit(baseValue);
         else
@@ -119,7 +119,12 @@ public class Quantity<U> where U : struct
         double sum = base1 + base2;
 
         dynamic t = targetUnit;
-        double result = t.ConvertFromBaseUnit(sum);
+        double result;
+        
+        if (t is VolumeUnit v)
+            result = v.ConvertFromBaseUnit(sum);
+        else
+            result = t.ConvertFromBaseUnit(sum);
 
         return new Quantity<U>(result, targetUnit);
     }
@@ -137,7 +142,12 @@ public class Quantity<U> where U : struct
         double baseResult = baseValue1 - baseValue2;
 
         dynamic u = this.unit;
-        double result = u.ConvertFromBaseUnit(baseResult);
+        double result;
+        
+        if (u is VolumeUnit v)
+            result = v.ConvertFromBaseUnit(baseResult);
+        else
+            result = u.ConvertFromBaseUnit(baseResult);
 
         result = Math.Round(result, 2);
 
@@ -158,7 +168,12 @@ public class Quantity<U> where U : struct
         double baseResult = baseValue1 - baseValue2;
 
         dynamic t = targetUnit;
-        double result = t.ConvertFromBaseUnit(baseResult);
+        double result;
+        
+        if (t is VolumeUnit v)
+            result = v.ConvertFromBaseUnit(baseResult);
+        else
+            result = t.ConvertFromBaseUnit(baseResult);
 
         result = Math.Round(result, 2);
 

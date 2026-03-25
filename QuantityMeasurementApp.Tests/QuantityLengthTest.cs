@@ -749,8 +749,7 @@ public void GivenTwoTemperatures_WhenAdded_ShouldThrowException()
 public void UC16_SaveOperation_ShouldInsertRecordInCache()
 {
     // Arrange
-    IQuantityMeasurementRepository repository =
-        new QuantityMeasurementCacheRepository();
+    IQuantityMeasurementRepository repository = null; // TODO: Fix with proper dependency injection
 
     QuantityMeasurementEntity entity = new QuantityMeasurementEntity
     {
@@ -775,8 +774,7 @@ public void UC16_SaveOperation_ShouldInsertRecordInCache()
 public void UC16_GetByOperation_ShouldReturnCorrectRecords()
 {
     // Arrange
-    IQuantityMeasurementRepository repository =
-        new QuantityMeasurementCacheRepository();
+    IQuantityMeasurementRepository repository = null; // TODO: Fix with proper dependency injection
 
     repository.Save(new QuantityMeasurementEntity
     {
@@ -800,8 +798,7 @@ public void UC16_GetByOperation_ShouldReturnCorrectRecords()
 public void UC16_GetByMeasurementType_ShouldReturnCorrectRecords()
 {
     // Arrange
-    IQuantityMeasurementRepository repository =
-        new QuantityMeasurementCacheRepository();
+    IQuantityMeasurementRepository repository = null; // TODO: Fix with proper dependency injection
 
     repository.Save(new QuantityMeasurementEntity
     {
@@ -825,8 +822,7 @@ public void UC16_GetByMeasurementType_ShouldReturnCorrectRecords()
 public void UC16_GetTotalCount_ShouldReturnTotalCacheRecords()
 {
     // Arrange
-    IQuantityMeasurementRepository repository =
-        new QuantityMeasurementCacheRepository();
+    IQuantityMeasurementRepository repository = null; // TODO: Fix with proper dependency injection
 
     repository.Save(new QuantityMeasurementEntity
     {
@@ -850,8 +846,7 @@ public void UC16_GetTotalCount_ShouldReturnTotalCacheRecords()
 public void UC16_DeleteAll_ShouldRemoveAllRecordsFromCache()
 {
     // Arrange
-    IQuantityMeasurementRepository repository =
-        new QuantityMeasurementCacheRepository();
+    IQuantityMeasurementRepository repository = null; // TODO: Fix with proper dependency injection
 
     repository.Save(new QuantityMeasurementEntity
     {

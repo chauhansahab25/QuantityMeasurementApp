@@ -73,7 +73,10 @@ public class Menu : IMenu
         {
             Console.WriteLine("❌ Database is not available. Using Cache Memory until database becomes active.");
             
-            repository = new QuantityMeasurementCacheRepository();
+            // repository = new QuantityMeasurementRepository();
+            // TODO: Fix dependency injection for repository
+            Console.WriteLine("Repository initialization needs to be updated for new structure.");
+            return;
             isUsingCache = true;
             service = new QuantityMeasurementServiceImpl(repository);
             return;
@@ -102,15 +105,17 @@ public class Menu : IMenu
             {
                 case "1":
                     Console.WriteLine("\n✓ Cache Memory selected - Using in-memory storage with JSON persistence");
-                    repository = new QuantityMeasurementCacheRepository();
-                    isUsingCache = true;
-                    break;
+                    // repository = new QuantityMeasurementRepository();
+                    // TODO: Fix dependency injection for repository
+                    Console.WriteLine("Repository initialization needs to be updated for new structure.");
+                    return;
                     
                 case "2":
                     Console.WriteLine("\n✓ Database selected - Using SQL Server persistent storage");
-                    repository = new QuantityMeasurementDatabaseRepository(config);
-                    isUsingCache = false;
-                    break;
+                    // repository = new QuantityMeasurementRepository();
+                    // TODO: Fix dependency injection for repository
+                    Console.WriteLine("Repository initialization needs to be updated for new structure.");
+                    return;
                     
                 default:
                     Console.WriteLine("Invalid choice. Please enter 1 or 2.");
@@ -125,7 +130,7 @@ public class Menu : IMenu
                 // Reuse the same database repository instance if already created for database option
                 if (databaseRepository == null)
                 {
-                    databaseRepository = new QuantityMeasurementDatabaseRepository(config);
+                    // databaseRepository = new QuantityMeasurementRepository();
                 }
                 syncService = new DataSyncService((ICacheRepository)repository, databaseRepository);
             }
@@ -139,29 +144,29 @@ public class Menu : IMenu
         try
         {
             // Create temporary cache repository to check for pending data
-            var tempCacheRepo = new QuantityMeasurementCacheRepository();
+            // var tempCacheRepo = new QuantityMeasurementRepository();
             
-            if (tempCacheRepo.HasPendingData())
-            {
-                Console.WriteLine("\n📝 Found pending data in JSON file from previous session.");                
-                // Use existing database repository if available, create only if needed
-                if (databaseRepository == null)
-                {
-                    databaseRepository = new QuantityMeasurementDatabaseRepository(config);
-                }
-                var tempSyncService = new DataSyncService(tempCacheRepo, databaseRepository);
+            // if (tempCacheRepo.HasPendingData())
+            // {
+            //     Console.WriteLine("\n📝 Found pending data in JSON file from previous session.");                
+            //     // Use existing database repository if available, create only if needed
+            //     if (databaseRepository == null)
+            //     {
+            //         // databaseRepository = new QuantityMeasurementRepository();
+            //     }
+            //     var tempSyncService = new DataSyncService(tempCacheRepo, databaseRepository);
                 
-                bool success = tempSyncService.UploadPendingDataToDatabase(silent: false);
+            //     bool success = tempSyncService.UploadPendingDataToDatabase(silent: false);
                 
-                if (success)
-                {
-                    Console.WriteLine("✅ Pending data uploaded to database!\n");
-                }
-                else
-                {
-                    Console.WriteLine("⚠️ Failed to upload pending data. Data remains in JSON file.\n");
-                }
-            }
+            //     if (success)
+            //     {
+            //         Console.WriteLine("✅ Pending data uploaded to database!\n");
+            //     }
+            //     else
+            //     {
+            //         Console.WriteLine("❌ Failed to upload pending data to database.\n");
+            //     }
+            // }
         }
         catch (Exception ex)
         {
@@ -174,13 +179,9 @@ public class Menu : IMenu
         try
         {
             Console.WriteLine("Testing database connection...");
-            // Use existing database repository if available, create only if needed
-            if (databaseRepository == null)
-            {
-                databaseRepository = new QuantityMeasurementDatabaseRepository(config);
-            }
-            bool isConnected = databaseRepository.TestConnection();
-            return isConnected;
+            // TODO: Implement proper database connectivity check with dependency injection
+            Console.WriteLine("Database connectivity check needs to be updated for new structure.");
+            return false; // Return false temporarily
         }
         catch (Exception ex)
         {

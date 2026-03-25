@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantityMeasurementBusiness
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantityMeasurementConsoleApp", "QuantityMeasurementConsoleApp\QuantityMeasurementConsoleApp.csproj", "{E75659C2-F26E-4C0F-A6D7-1391A1A190C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantityMeasurementWebApi", "QuantityMeasurementWebApi\QuantityMeasurementWebApi.csproj", "{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,6 +85,18 @@ Global
 		{E75659C2-F26E-4C0F-A6D7-1391A1A190C0}.Release|x64.Build.0 = Release|Any CPU
 		{E75659C2-F26E-4C0F-A6D7-1391A1A190C0}.Release|x86.ActiveCfg = Release|Any CPU
 		{E75659C2-F26E-4C0F-A6D7-1391A1A190C0}.Release|x86.Build.0 = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|x64.Build.0 = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Debug|x86.Build.0 = Debug|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|x64.ActiveCfg = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|x64.Build.0 = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|x86.ActiveCfg = Release|Any CPU
+		{1D756FF8-84E1-47F3-A6A4-A126FEE7CCCB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
