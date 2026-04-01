@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QuantityMeasurementRepositoryLayer.Context;
 
@@ -11,9 +12,11 @@ using QuantityMeasurementRepositoryLayer.Context;
 namespace QuantityMeasurementWebApi.Migrations
 {
     [DbContext(typeof(QuantityMeasurementDbContext))]
-    partial class QuantityMeasurementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260331103141_AddUserManagement")]
+    partial class AddUserManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,8 +123,13 @@ namespace QuantityMeasurementWebApi.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GoogleId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -133,13 +141,12 @@ namespace QuantityMeasurementWebApi.Migrations
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProfilePictureUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -150,10 +157,55 @@ namespace QuantityMeasurementWebApi.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Users_Email");
 
+                    b.HasIndex("GoogleId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Users_GoogleId");
+
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_Users_IsActive");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("QuantityMeasurementModelLayer.Entities.UserOperation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("OperationType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("PerformedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<int>("QuantityMeasurementId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperationType")
+                        .HasDatabaseName("IX_UserOperations_OperationType");
+
+                    b.HasIndex("PerformedAt")
+                        .HasDatabaseName("IX_UserOperations_PerformedAt");
+
+                    b.HasIndex("QuantityMeasurementId")
+                        .HasDatabaseName("IX_UserOperations_QuantityMeasurementId");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("IX_UserOperations_UserId");
+
+                    b.ToTable("UserOperations");
                 });
 
             modelBuilder.Entity("QuantityMeasurementModelLayer.Entities.UserSession", b =>
@@ -215,6 +267,25 @@ namespace QuantityMeasurementWebApi.Migrations
                     b.ToTable("UserSessions");
                 });
 
+            modelBuilder.Entity("QuantityMeasurementModelLayer.Entities.UserOperation", b =>
+                {
+                    b.HasOne("QuantityMeasurementModelLayer.Entities.QuantityMeasurementEntity", "QuantityMeasurement")
+                        .WithMany()
+                        .HasForeignKey("QuantityMeasurementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("QuantityMeasurementModelLayer.Entities.User", "User")
+                        .WithMany("UserOperations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("QuantityMeasurement");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("QuantityMeasurementModelLayer.Entities.UserSession", b =>
                 {
                     b.HasOne("QuantityMeasurementModelLayer.Entities.User", "User")
@@ -228,6 +299,8 @@ namespace QuantityMeasurementWebApi.Migrations
 
             modelBuilder.Entity("QuantityMeasurementModelLayer.Entities.User", b =>
                 {
+                    b.Navigation("UserOperations");
+
                     b.Navigation("UserSessions");
                 });
 #pragma warning restore 612, 618

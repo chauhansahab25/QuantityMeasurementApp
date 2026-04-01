@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using QuantityMeasurementRepositoryLayer.Context;
 using QuantityMeasurementRepositoryLayer.Repositories;
 using QuantityMeasurementRepositoryLayer.Interfaces;
@@ -21,7 +24,6 @@ builder.Services.AddSwaggerGen(c =>
         Description = "REST API for Quantity Measurement operations with caching and database persistence"
     });
     
-    // Include XML comments if available
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
@@ -54,6 +56,38 @@ builder.Services.AddScoped<QuantityMeasurementBusinessLayer.Services.IRedisCache
 // Register business layer services
 builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServiceImpl>();
 
+// Register security services
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Configure JWT Authentication
+var jwtKey = builder.Configuration["JwtSettings:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
+var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "QuantityMeasurementAPI";
+var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? "QuantityMeasurementUsers";
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtIssuer,
+        ValidateAudience = true,
+        ValidAudience = jwtAudience,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+// Add Authorization
+builder.Services.AddAuthorization();
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -85,10 +119,20 @@ if (app.Environment.IsDevelopment())
 // Add global exception handling middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
+// Add security headers middleware
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// Add rate limiting middleware
+app.UseMiddleware<RateLimitingMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
+// Add JWT authentication middleware
+app.UseMiddleware<JwtMiddleware>();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -106,7 +150,7 @@ app.MapGet("/", () => new
         Swagger = "/swagger",
         Health = "/health",
         Operations = "/api/v1/quantitymeasurement",
-        History = "/api/v1/history"
+        Auth = "/api/v1/auth"
     }
 });
 

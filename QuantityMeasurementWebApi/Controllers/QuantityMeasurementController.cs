@@ -25,11 +25,6 @@ public class QuantityMeasurementController : ControllerBase
         _logger = logger;
     }
 
-    /// <summary>
-    /// Compare two quantities
-    /// </summary>
-    /// <param name="request">Comparison request</param>
-    /// <returns>Comparison result</returns>
     [HttpPost("compare")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Compare([FromBody] QuantityMeasurementRequestDto request)
     {
@@ -76,12 +71,6 @@ public class QuantityMeasurementController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Convert a quantity from one unit to another
-    /// </summary>
-    /// <param name="request">Conversion request</param>
-    /// <param name="targetUnit">Target unit for conversion</param>
-    /// <returns>Conversion result</returns>
     [HttpPost("convert")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Convert(
         [FromBody] QuantityMeasurementRequestDto request, 
@@ -139,11 +128,6 @@ public class QuantityMeasurementController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Add two quantities
-    /// </summary>
-    /// <param name="request">Addition request</param>
-    /// <returns>Addition result</returns>
     [HttpPost("add")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Add([FromBody] QuantityMeasurementRequestDto request)
     {
@@ -190,11 +174,6 @@ public class QuantityMeasurementController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Subtract two quantities
-    /// </summary>
-    /// <param name="request">Subtraction request</param>
-    /// <returns>Subtraction result</returns>
     [HttpPost("subtract")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Subtract([FromBody] QuantityMeasurementRequestDto request)
     {
@@ -241,11 +220,6 @@ public class QuantityMeasurementController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Divide two quantities
-    /// </summary>
-    /// <param name="request">Division request</param>
-    /// <returns>Division result</returns>
     [HttpPost("divide")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Divide([FromBody] QuantityMeasurementRequestDto request)
     {

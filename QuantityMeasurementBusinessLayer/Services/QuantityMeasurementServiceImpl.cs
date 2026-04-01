@@ -16,6 +16,33 @@ public class QuantityMeasurementServiceImpl : IQuantityMeasurementService
         repository = repo;
     }
 
+    // 🔹 Convert base value back to specific unit
+    private double ConvertFromBase(double baseValue, string unit)
+    {
+        if (Enum.TryParse(unit, out LengthUnit length))
+            return baseValue / length.GetConversionFactor();
+
+        if (Enum.TryParse(unit, out WeightUnit weight))
+            return baseValue / weight.GetConversionFactor();
+
+        if (Enum.TryParse(unit, out VolumeUnit volume))
+            return baseValue / volume.ToBaseUnit();
+
+        if (Enum.TryParse(unit, out TemperatureUnit temp))
+        {
+            switch (temp)
+            {
+                case TemperatureUnit.CELSIUS:
+                    return baseValue;
+
+                case TemperatureUnit.FAHRENHEIT:
+                    return baseValue * 9 / 5 + 32;
+            }
+        }
+
+        throw new ArgumentException("Unsupported unit");
+    }
+
     // 🔹 Convert unit to base value
     private double ConvertToBase(double value, string unit)
     {
@@ -76,7 +103,8 @@ public class QuantityMeasurementServiceImpl : IQuantityMeasurementService
         double v1 = ConvertToBase(q1.Value, q1.Unit);
         double v2 = ConvertToBase(q2.Value, q2.Unit);
 
-        double result = v1 + v2;
+        double resultInBase = v1 + v2;
+        double result = ConvertFromBase(resultInBase, q1.Unit);
 
         SaveOperation(q1.Value, q1.Unit, q2.Value, q2.Unit, "ADD", result);
 
@@ -88,7 +116,8 @@ public class QuantityMeasurementServiceImpl : IQuantityMeasurementService
         double v1 = ConvertToBase(q1.Value, q1.Unit);
         double v2 = ConvertToBase(q2.Value, q2.Unit);
 
-        double result = v1 - v2;
+        double resultInBase = v1 - v2;
+        double result = ConvertFromBase(resultInBase, q1.Unit);
 
         SaveOperation(q1.Value, q1.Unit, q2.Value, q2.Unit, "SUBTRACT", result);
 
