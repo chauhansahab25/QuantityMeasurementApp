@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using QuantityMeasurementRepositoryLayer.Context;
 using QuantityMeasurementRepositoryLayer.Repositories;
 using QuantityMeasurementRepositoryLayer.Interfaces;
@@ -11,11 +8,10 @@ using QuantityMeasurementWebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers();//Add services to the container.
 
-// Configure Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddEndpointsApiExplorer();// Configure Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { 
@@ -24,7 +20,8 @@ builder.Services.AddSwaggerGen(c =>
         Description = "REST API for Quantity Measurement operations with caching and database persistence"
     });
     
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";// Include XML comments if available
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
     {
@@ -32,8 +29,7 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-// Configure Entity Framework with SQL Server (Docker)
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") // Configure Entity Framework with SQL Server (Docker)
     ?? "Server=localhost,1434;Database=QuantityMeasurementDb;User Id=sa;Password=Glauniversity@123;TrustServerCertificate=true;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<QuantityMeasurementDbContext>(options =>
@@ -55,38 +51,8 @@ builder.Services.AddScoped<QuantityMeasurementBusinessLayer.Services.IRedisCache
 
 // Register business layer services
 builder.Services.AddScoped<IQuantityMeasurementService, QuantityMeasurementServiceImpl>();
-
-// Register security services
-builder.Services.AddScoped<ISecurityService, SecurityService>();
-builder.Services.AddScoped<IUserService, UserService>();
-
-// Configure JWT Authentication
-var jwtKey = builder.Configuration["JwtSettings:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
-var jwtIssuer = builder.Configuration["JwtSettings:Issuer"] ?? "QuantityMeasurementAPI";
-var jwtAudience = builder.Configuration["JwtSettings:Audience"] ?? "QuantityMeasurementUsers";
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidIssuer = jwtIssuer,
-        ValidateAudience = true,
-        ValidAudience = jwtAudience,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-// Add Authorization
-builder.Services.AddAuthorization();
+builder.Services.AddScoped<QuantityMeasurementBusinessLayer.Services.IUserService, QuantityMeasurementBusinessLayer.Services.UserService>();
+builder.Services.AddScoped<QuantityMeasurementBusinessLayer.Services.ISecurityService, QuantityMeasurementBusinessLayer.Services.SecurityService>();
 
 // Add CORS
 builder.Services.AddCors(options =>
@@ -119,20 +85,10 @@ if (app.Environment.IsDevelopment())
 // Add global exception handling middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
-// Add security headers middleware
-app.UseMiddleware<SecurityHeadersMiddleware>();
-
-// Add rate limiting middleware
-app.UseMiddleware<RateLimitingMiddleware>();
-
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
 
-// Add JWT authentication middleware
-app.UseMiddleware<JwtMiddleware>();
-
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -153,5 +109,4 @@ app.MapGet("/", () => new
         Auth = "/api/v1/auth"
     }
 });
-
 app.Run();
