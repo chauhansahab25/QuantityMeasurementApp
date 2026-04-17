@@ -32,7 +32,7 @@ public class QuantityMeasurementDbContext : DbContext
             entity.Property(e => e.ResultString).HasMaxLength(500);
             entity.Property(e => e.ErrorMessage).HasMaxLength(500);
             
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.IsError).HasDefaultValue(false);
             
             entity.HasIndex(e => e.Operation).HasDatabaseName("IX_QuantityMeasurements_Operation");

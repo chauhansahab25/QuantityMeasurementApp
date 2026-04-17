@@ -29,11 +29,24 @@ builder.Services.AddSwaggerGen(c =>
     }
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") // Configure Entity Framework with SQL Server (Docker)
-    ?? "Server=localhost,1434;Database=QuantityMeasurementDb;User Id=sa;Password=Glauniversity@123;TrustServerCertificate=true;MultipleActiveResultSets=true";
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// Support Render's DATABASE_URL if provided
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+if (!string.IsNullOrEmpty(databaseUrl))
+{
+    // Parse postgres://user:password@host:port/database mapping to Npgsql connection string
+    var uri = new Uri(databaseUrl);
+    var userInfo = uri.UserInfo.Split(':');
+    connectionString = $"Host={uri.Host};Port={uri.Port};Database={uri.AbsolutePath.TrimStart('/')};Username={userInfo[0]};Password={userInfo[1]};SSL Mode=Require;Trust Server Certificate=true";
+}
+else if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = "Host=localhost;Database=QuantityMeasurementDb;Username=postgres;Password=postgres";
+}
 
 builder.Services.AddDbContext<QuantityMeasurementDbContext>(options =>
-    options.UseSqlServer(connectionString, b => b.MigrationsAssembly("QuantityMeasurementWebApi")));
+    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementWebApi")));
 
 // Configure Redis Cache
 var redisConnectionString = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6380";
@@ -85,7 +98,11 @@ if (app.Environment.IsDevelopment())
 // Add global exception handling middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
-app.UseHttpsRedirection();
+// Render handles HTTPS at the load balancer level
+if (!app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseCors("AllowAll");
 
@@ -109,4 +126,6 @@ app.MapGet("/", () => new
         Auth = "/api/v1/auth"
     }
 });
-app.Run();
+// Use PORT environment variable if provided by Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+app.Run($"http://0.0.0.0:{port}");

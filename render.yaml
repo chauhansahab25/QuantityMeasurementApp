@@ -1,0 +1,44 @@
+services:
+  # Backend API
+  - type: web
+    name: quantity-measurement-api
+    runtime: docker
+    plan: free # Change to productive if needed
+    region: frankfurt # Or your preferred region
+    envVars:
+      - key: ASPIETCORE_ENVIRONMENT
+        value: Production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: quantity-db
+          property: connectionString
+      - key: Redis
+        fromService:
+          type: redis
+          name: quantity-cache
+          property: connectionString
+
+  # Frontend (Angular)
+  - type: web
+    name: quantity-measurement-frontend
+    runtime: docker
+    dockerfile: Dockerfile
+    rootDir: ../QuantityMeasurementApp_Frontend # Path relative to repo root
+    plan: free
+    envVars:
+      - key: API_URL
+        value: https://quantity-measurement-api.onrender.com
+
+databases:
+  # Managed PostgreSQL
+  - name: quantity-db
+    databaseName: quantity_measurement
+    user: admin
+    plan: free # free tier is available
+    region: frankfurt
+
+redis:
+  # Managed Redis
+  - name: quantity-cache
+    plan: free
+    region: frankfurt
