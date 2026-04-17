@@ -23,7 +23,11 @@ services:
     name: quantity-cache
     plan: free
     region: frankfurt
-
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
+# This will allow you to access the cache internally,
+# and satisfies Render's requirement to specify an IP allow list.
 databases:
   # Managed PostgreSQL
   - name: quantity-db
@@ -31,3 +35,6 @@ databases:
     user: admin
     plan: free
     region: frankfurt
+    ipAllowList:
+      - source: 0.0.0.0/0
+        description: allow all
