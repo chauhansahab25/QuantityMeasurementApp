@@ -92,8 +92,9 @@ public class UserService : IUserService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating user for email {Email}", request.Email);
-            return new UserCreationResult { ErrorMessage = ex.Message };
+            var fullError = ex.InnerException != null ? $"{ex.Message} | Inner: {ex.InnerException.Message}" : ex.Message;
+            _logger.LogError(ex, "Error creating user for email {Email}: {Error}", request.Email, fullError);
+            return new UserCreationResult { ErrorMessage = fullError };
         }
     }
 

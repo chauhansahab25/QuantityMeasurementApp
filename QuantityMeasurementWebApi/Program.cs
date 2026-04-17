@@ -116,6 +116,11 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Console.WriteLine($"An error occurred while applying migrations: {ex.Message}");
+        if (ex.InnerException != null)
+        {
+            Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
+        }
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
     }
 }
 
