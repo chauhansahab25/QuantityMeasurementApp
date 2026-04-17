@@ -50,7 +50,7 @@ public class QuantityMeasurementDbContext : DbContext
             entity.Property(e => e.FirstName).HasMaxLength(50).IsRequired();
             entity.Property(e => e.LastName).HasMaxLength(50).IsRequired();
             
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             
             entity.HasIndex(e => e.Email).IsUnique().HasDatabaseName("IX_Users_Email");
@@ -65,7 +65,7 @@ public class QuantityMeasurementDbContext : DbContext
             entity.Property(e => e.IpAddress).HasMaxLength(45).IsRequired();
             entity.Property(e => e.UserAgent).HasMaxLength(500);
             
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             
             entity.HasIndex(e => e.JwtTokenId).IsUnique().HasDatabaseName("IX_UserSessions_JwtTokenId");

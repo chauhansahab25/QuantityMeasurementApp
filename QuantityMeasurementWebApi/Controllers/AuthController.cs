@@ -36,13 +36,20 @@ public class AuthController : ControllerBase
                 return BadRequest(new { error = "Invalid registration data", details = ModelState });
             }
 
-            var user = await _userService.CreateUserAsync(request);
+            var result = await _userService.CreateUserAsync(request);
             
-            if (user == null)
+            if (result.AlreadyExists)
             {
                 return Conflict(new { error = "User with this email already exists" });
             }
 
+            if (result.ErrorMessage != null)
+            {
+                _logger.LogError("User creation failed with error: {Error}", result.ErrorMessage);
+                return StatusCode(500, new { error = "Registration failed due to server error", details = result.ErrorMessage });
+            }
+
+            var user = result.User!;
             var sessionId = Guid.NewGuid().ToString();
             var jwtToken = _securityService.GenerateJwtToken(user, sessionId);
 
@@ -70,7 +77,7 @@ public class AuthController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error during user registration");
-            return StatusCode(500, new { error = "Registration failed" });
+            return StatusCode(500, new { error = "Registration failed", details = ex.Message });
         }
     }
 

@@ -6,10 +6,17 @@ using QuantityMeasurementRepositoryLayer.Context;
 
 namespace QuantityMeasurementBusinessLayer.Services;
 
+public class UserCreationResult
+{
+    public User? User { get; set; }
+    public bool AlreadyExists { get; set; }
+    public string? ErrorMessage { get; set; }
+}
+
 public interface IUserService
 {
     Task<User?> GetUserByEmailAsync(string email);
-    Task<User?> CreateUserAsync(RegisterUserRequest request);
+    Task<UserCreationResult> CreateUserAsync(RegisterUserRequest request);
     Task<User?> AuthenticateUserAsync(string email, string password);
     Task<bool> ChangePasswordAsync(int userId, string currentPassword, string newPassword);
     Task<UserSession> CreateUserSessionAsync(User user, string jwtTokenId, string ipAddress, string? userAgent = null);
@@ -51,7 +58,7 @@ public class UserService : IUserService
         }
     }
 
-    public async Task<User?> CreateUserAsync(RegisterUserRequest request)
+    public async Task<UserCreationResult> CreateUserAsync(RegisterUserRequest request)
     {
         try
         {
@@ -60,7 +67,7 @@ public class UserService : IUserService
             if (existingUser != null)
             {
                 _logger.LogWarning("User creation failed - email already exists: {Email}", request.Email);
-                return null;
+                return new UserCreationResult { AlreadyExists = true };
             }
 
             // Hash password
@@ -81,12 +88,12 @@ public class UserService : IUserService
             await _context.SaveChangesAsync();
 
             _logger.LogInformation("Created new user {UserId} for email {Email}", newUser.Id, newUser.Email);
-            return newUser;
+            return new UserCreationResult { User = newUser };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating user for email {Email}", request.Email);
-            return null;
+            return new UserCreationResult { ErrorMessage = ex.Message };
         }
     }
 
