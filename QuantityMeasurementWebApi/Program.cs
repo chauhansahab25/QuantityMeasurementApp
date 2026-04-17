@@ -109,18 +109,34 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<QuantityMeasurementDbContext>();
-        dbContext.Database.Migrate();
-        // Since we don't have access to the logger here easily, we'll write to console for Render logs
-        Console.WriteLine("Database migrations applied successfully.");
+        
+        // Try migrations first
+        try
+        {
+            dbContext.Database.Migrate();
+            Console.WriteLine("Database migrations applied successfully.");
+        }
+        catch (Exception migEx)
+        {
+            Console.WriteLine($"Migration failed: {migEx.Message}");
+            
+            // Fallback: Ensure database exists and schema is created
+            Console.WriteLine("Attempting EnsureCreated as fallback...");
+            dbContext.Database.EnsureCreated();
+            Console.WriteLine("Database ensured (EnsureCreated fallback).");
+        }
+        
+        // Verify connection
+        var canConnect = dbContext.Database.CanConnect();
+        Console.WriteLine($"Database connection test: {(canConnect ? "SUCCESS" : "FAILED")}");
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"An error occurred while applying migrations: {ex.Message}");
+        Console.WriteLine($"CRITICAL: Database setup failed: {ex.Message}");
         if (ex.InnerException != null)
         {
             Console.WriteLine($"Inner exception: {ex.InnerException.Message}");
         }
-        Console.WriteLine($"Stack trace: {ex.StackTrace}");
     }
 }
 
