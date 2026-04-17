@@ -89,6 +89,22 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+// Automatically apply database migrations on startup
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<QuantityMeasurementDbContext>();
+        dbContext.Database.Migrate();
+        // Since we don't have access to the logger here easily, we'll write to console for Render logs
+        Console.WriteLine("Database migrations applied successfully.");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while applying migrations: {ex.Message}");
+    }
+}
+
 // Configure the HTTP request pipeline.
 // Enable Swagger even in Production for debugging purposes
 app.UseSwagger();
