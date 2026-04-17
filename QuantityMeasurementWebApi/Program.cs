@@ -67,13 +67,27 @@ else if (string.IsNullOrEmpty(connectionString))
 builder.Services.AddDbContext<QuantityMeasurementDbContext>(options =>
     options.UseNpgsql(connectionString, b => b.MigrationsAssembly("QuantityMeasurementWebApi")));
 
-// Configure Redis Cache
-var redisConnectionString = builder.Configuration.GetConnectionString("Redis") ?? "localhost:6380";
-builder.Services.AddStackExchangeRedisCache(options =>
+// Configure Redis Cache (optional - only if Redis is available)
+var redisConnectionString = builder.Configuration.GetConnectionString("Redis");
+var redisUrl = Environment.GetEnvironmentVariable("REDIS_URL");
+if (!string.IsNullOrEmpty(redisUrl))
 {
-    options.Configuration = redisConnectionString;
-    options.InstanceName = "QuantityMeasurement_";
-});
+    redisConnectionString = redisUrl;
+}
+
+if (!string.IsNullOrEmpty(redisConnectionString) && !redisConnectionString.Contains("localhost"))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "QuantityMeasurement_";
+    });
+    Console.WriteLine("Redis cache configured.");
+}
+else
+{
+    Console.WriteLine("Redis not configured - running without distributed cache.");
+}
 
 // Register repositories
 builder.Services.AddScoped<QuantityMeasurementRepositoryLayer.Interfaces.IQuantityMeasurementRepository, QuantityMeasurementRepositoryLayer.Repositories.QuantityMeasurementRepository>();
@@ -98,8 +112,11 @@ builder.Services.AddCors(options =>
 });
 
 // Add basic health checks
-builder.Services.AddHealthChecks()
-    .AddRedis(redisConnectionString);
+var healthChecks = builder.Services.AddHealthChecks();
+if (!string.IsNullOrEmpty(redisConnectionString) && !redisConnectionString.Contains("localhost"))
+{
+    healthChecks.AddRedis(redisConnectionString);
+}
 
 var app = builder.Build();
 
