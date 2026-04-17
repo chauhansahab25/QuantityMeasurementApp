@@ -6,7 +6,7 @@ services:
     plan: free # Change to productive if needed
     region: frankfurt # Or your preferred region
     envVars:
-      - key: ASPIETCORE_ENVIRONMENT
+      - key: ASPNETCORE_ENVIRONMENT
         value: Production
       - key: DATABASE_URL
         fromDatabase:
