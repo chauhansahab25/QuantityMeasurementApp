@@ -8,7 +8,12 @@ using QuantityMeasurementWebApi.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();//Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddRouting(options => 
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
 
 
 builder.Services.AddEndpointsApiExplorer();// Configure Swagger
@@ -85,15 +90,13 @@ builder.Services.AddHealthChecks()
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Enable Swagger even in Production for debugging purposes
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quantity Measurement API v1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at apps root
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Quantity Measurement API v1");
+    c.RoutePrefix = "swagger"; // Set Swagger UI at /swagger
+});
 
 // Add global exception handling middleware
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
