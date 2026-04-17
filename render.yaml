@@ -18,17 +18,6 @@ services:
           name: quantity-cache
           property: connectionString
 
-  # Frontend (Angular)
-  - type: web
-    name: quantity-measurement-frontend
-    runtime: docker
-    dockerfile: Dockerfile
-    rootDir: ../QuantityMeasurementApp_Frontend # Path relative to repo root
-    plan: free
-    envVars:
-      - key: API_URL
-        value: https://quantity-measurement-api.onrender.com
-
 databases:
   # Managed PostgreSQL
   - name: quantity-db
