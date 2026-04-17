@@ -13,20 +13,21 @@ services:
           name: quantity-db
           property: connectionString
       - key: Redis
-        fromDatabase:
+        fromService:
+          type: keyvalue
           name: quantity-cache
           property: connectionString
+
+  # Managed Redis (Key Value)
+  - type: keyvalue
+    name: quantity-cache
+    plan: free
+    region: frankfurt
 
 databases:
   # Managed PostgreSQL
   - name: quantity-db
     databaseName: quantity_measurement
     user: admin
-    plan: free
-    region: frankfurt
-
-  # Managed Redis (Key Value)
-  - name: quantity-cache
-    type: keyvalue
     plan: free
     region: frankfurt
