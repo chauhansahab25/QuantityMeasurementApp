@@ -3,8 +3,8 @@ services:
   - type: web
     name: quantity-measurement-api
     runtime: docker
-    plan: free # Change to productive if needed
-    region: frankfurt # Or your preferred region
+    plan: free
+    region: frankfurt
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
@@ -13,8 +13,7 @@ services:
           name: quantity-db
           property: connectionString
       - key: Redis
-        fromService:
-          type: redis
+        fromDatabase:
           name: quantity-cache
           property: connectionString
 
@@ -23,11 +22,11 @@ databases:
   - name: quantity-db
     databaseName: quantity_measurement
     user: admin
-    plan: free # free tier is available
+    plan: free
     region: frankfurt
 
-redis:
-  # Managed Redis
+  # Managed Redis (Key Value)
   - name: quantity-cache
+    type: keyvalue
     plan: free
     region: frankfurt
