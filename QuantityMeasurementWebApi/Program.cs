@@ -45,13 +45,13 @@ if (!string.IsNullOrEmpty(databaseUrl))
         // Parse postgres://user:password@host:port/database mapping to Npgsql connection string
         var uri = new Uri(databaseUrl);
         var userInfo = uri.UserInfo.Split(':');
-        var port = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port if not specified
+        var dbPort = uri.Port > 0 ? uri.Port : 5432; // Default PostgreSQL port if not specified
         var password = userInfo.Length > 1 ? userInfo[1] : "";
         var database = uri.AbsolutePath.TrimStart('/').Split('?')[0];
         
-        Console.WriteLine($"DEBUG: Parsed DATABASE_URL - Host={uri.Host}, Port={port}, Database={database}, User={userInfo[0]}, HasPassword={!string.IsNullOrEmpty(password)}");
+        Console.WriteLine($"DEBUG: Parsed DATABASE_URL - Host={uri.Host}, Port={dbPort}, Database={database}, User={userInfo[0]}, HasPassword={!string.IsNullOrEmpty(password)}");
         
-        connectionString = $"Host={uri.Host};Port={port};Database={database};Username={userInfo[0]};Password={password};SSL Mode=Require;Trust Server Certificate=true";
+        connectionString = $"Host={uri.Host};Port={dbPort};Database={database};Username={userInfo[0]};Password={password};SSL Mode=Require;Trust Server Certificate=true";
     }
     catch (Exception ex)
     {
