@@ -1,0 +1,95 @@
+
+services:
+  # SQL Server Database
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: quantitymeasurement-db
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Glauniversity@123
+      - MSSQL_PID=Express
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - microservices-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: quantitymeasurement-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - microservices-network
+
+  # API Gateway (Ocelot)
+  gateway:
+    build:
+      context: ./QuantityMeasurementGateway
+      dockerfile: Dockerfile
+    container_name: quantitymeasurement-gateway
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+    depends_on:
+      - authentication-service
+      - quantitymeasurement-service
+    networks:
+      - microservices-network
+
+  # Authentication Service
+  authentication-service:
+    build:
+      context: ./AuthenticationService
+      dockerfile: Dockerfile
+    container_name: authentication-service
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=QuantityMeasurementDb;User Id=sa;Password=Glauniversity@123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - JwtSettings__Key=ThisIsASecretKeyForJWTTokenGeneration123456789
+      - JwtSettings__Issuer=AuthenticationService
+      - JwtSettings__Audience=QuantityMeasurementUsers
+    depends_on:
+      - sqlserver
+    networks:
+      - microservices-network
+
+  # Quantity Measurement Service
+  quantitymeasurement-service:
+    build:
+      context: ./QuantityMeasurementService
+      dockerfile: Dockerfile
+    container_name: quantitymeasurement-service
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=QuantityMeasurementDb;User Id=sa;Password=Glauniversity@123;TrustServerCertificate=true;MultipleActiveResultSets=true
+      - ConnectionStrings__Redis=redis:6379
+      - JwtSettings__Key=ThisIsASecretKeyForJWTTokenGeneration123456789
+      - JwtSettings__Issuer=QuantityMeasurementAPI
+      - JwtSettings__Audience=QuantityMeasurementUsers
+    depends_on:
+      - sqlserver
+      - redis
+    networks:
+      - microservices-network
+
+  
+volumes:
+  sqlserver_data:
+  redis_data:
+
+networks:
+  microservices-network:
+    driver: bridge

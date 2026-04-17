@@ -1,6 +1,0 @@
-@QuantityMeasurementWebApi_HostAddress = http://localhost:5212
-
-GET {{QuantityMeasurementWebApi_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
