@@ -12,7 +12,7 @@ using QuantityMeasurementRepositoryLayer.Context;
 namespace QuantityMeasurementWebApi.Migrations
 {
     [DbContext(typeof(QuantityMeasurementDbContext))]
-    [Migration("20260417070202_InitialPostgreSQL")]
+    [Migration("20260417115331_InitialPostgreSQL")]
     partial class InitialPostgreSQL
     {
         /// <inheritdoc />
@@ -114,7 +114,7 @@ namespace QuantityMeasurementWebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -170,7 +170,7 @@ namespace QuantityMeasurementWebApi.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("GETUTCDATE()");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("timestamp with time zone");
