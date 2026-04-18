@@ -86,7 +86,8 @@ if (!string.IsNullOrEmpty(redisConnectionString) && !redisConnectionString.Conta
 }
 else
 {
-    Console.WriteLine("Redis not configured - running without distributed cache.");
+    builder.Services.AddDistributedMemoryCache();
+    Console.WriteLine("Using in-memory distributed cache fallback.");
 }
 
 // Register repositories
