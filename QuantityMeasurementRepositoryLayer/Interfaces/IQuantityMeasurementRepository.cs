@@ -7,6 +7,7 @@ public interface IQuantityMeasurementRepository
     // Async methods (preferred)
     Task SaveAsync(QuantityMeasurementEntity entity);
     Task<List<QuantityMeasurementEntity>> GetAllAsync();
+    Task<(List<QuantityMeasurementEntity> Items, int TotalCount)> GetHistoryPagedAsync(int page, int pageSize, string? operation = null, string? measurementType = null);
     Task<List<QuantityMeasurementEntity>> GetByOperationAsync(string operation);
     Task<List<QuantityMeasurementEntity>> GetByMeasurementTypeAsync(string measurementType);
     Task<List<QuantityMeasurementEntity>> GetByDateRangeAsync(DateTime startDate, DateTime endDate);

@@ -50,6 +50,39 @@ public class QuantityMeasurementRepository : IQuantityMeasurementRepository
         }
     }
 
+    public async Task<(List<QuantityMeasurementEntity> Items, int TotalCount)> GetHistoryPagedAsync(int page, int pageSize, string? operation = null, string? measurementType = null)
+    {
+        try
+        {
+            var query = _context.QuantityMeasurements.AsQueryable();
+
+            if (!string.IsNullOrEmpty(operation))
+            {
+                query = query.Where(m => m.Operation.Equals(operation, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (!string.IsNullOrEmpty(measurementType))
+            {
+                query = query.Where(m => m.MeasurementType.Equals(measurementType, StringComparison.OrdinalIgnoreCase));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                .OrderByDescending(m => m.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting paginated history");
+            throw;
+        }
+    }
+
     public async Task<List<QuantityMeasurementEntity>> GetByOperationAsync(string operation)
     {
         try

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using QuantityMeasurementWebApi.DTOs;
 using QuantityMeasurementBusinessLayer.Services;
 using QuantityMeasurementBusinessLayer.Interfaces;
+using QuantityMeasurementRepositoryLayer.Interfaces;
 using QuantityMeasurementModelLayer.DTO;
 
 namespace QuantityMeasurementWebApi.Controllers;
@@ -12,15 +13,18 @@ namespace QuantityMeasurementWebApi.Controllers;
 public class QuantityMeasurementController : ControllerBase
 {
     private readonly IQuantityMeasurementService _quantityService;
+    private readonly IQuantityMeasurementRepository _quantityRepository;
     private readonly QuantityMeasurementBusinessLayer.Services.IRedisCacheService _cacheService;
     private readonly ILogger<QuantityMeasurementController> _logger;
 
     public QuantityMeasurementController(
         IQuantityMeasurementService quantityService,
+        IQuantityMeasurementRepository quantityRepository,
         QuantityMeasurementBusinessLayer.Services.IRedisCacheService cacheService,
         ILogger<QuantityMeasurementController> logger)
     {
         _quantityService = quantityService;
+        _quantityRepository = quantityRepository;
         _cacheService = cacheService;
         _logger = logger;
     }
@@ -277,6 +281,66 @@ public class QuantityMeasurementController : ControllerBase
                 MeasurementType = request.MeasurementType
             };
             return BadRequest(errorResponse);
+        }
+    }
+
+    [HttpGet("history")]
+    public async Task<ActionResult<HistoryResponseDto>> GetHistory(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 15,
+        [FromQuery] string? operation = null,
+        [FromQuery] string? measurementType = null)
+    {
+        try
+        {
+            var (items, totalCount) = await _quantityRepository.GetHistoryPagedAsync(page, pageSize, operation, measurementType);
+
+            var records = items.Select(m => new HistoryRecordDto
+            {
+                Id = m.Id,
+                Operation = m.Operation,
+                MeasurementType = m.MeasurementType,
+                FirstValue = m.FirstValue,
+                FirstUnit = m.FirstUnit,
+                SecondValue = m.SecondValue,
+                SecondUnit = m.SecondUnit,
+                Result = m.Result,
+                ResultString = m.ResultString,
+                ErrorMessage = m.ErrorMessage,
+                IsError = m.IsError,
+                CreatedAt = m.CreatedAt
+            }).ToList();
+
+            var response = new HistoryResponseDto
+            {
+                Data = records,
+                Total = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize),
+                Page = page,
+                PageSize = pageSize
+            };
+
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting history");
+            return BadRequest(new { error = ex.Message });
+        }
+    }
+
+    [HttpDelete("history")]
+    public async Task<ActionResult> ClearHistory()
+    {
+        try
+        {
+            await _quantityRepository.DeleteAllAsync();
+            return Ok(new { message = "History cleared successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error clearing history");
+            return BadRequest(new { error = ex.Message });
         }
     }
 }
