@@ -74,11 +74,14 @@ public class QuantityMeasurementController : ControllerBase
     [HttpPost("convert")]
     public async Task<ActionResult<QuantityMeasurementOperationResultDto>> Convert(
         [FromBody] QuantityMeasurementRequestDto request, 
-        [FromQuery] string targetUnit)
+        [FromQuery] string? targetUnit = null)
     {
         try
         {
-            if (string.IsNullOrEmpty(targetUnit))
+            // Use targetUnit from query if provided, otherwise from body
+            var effectiveTargetUnit = !string.IsNullOrEmpty(targetUnit) ? targetUnit : request.TargetUnit;
+            
+            if (string.IsNullOrEmpty(effectiveTargetUnit))
             {
                 return BadRequest(new QuantityMeasurementOperationResultDto
                 {
@@ -89,7 +92,7 @@ public class QuantityMeasurementController : ControllerBase
                 });
             }
 
-            var cacheKey = $"convert_{request.FirstValue}_{request.FirstUnit}_{targetUnit}_{request.MeasurementType}";
+            var cacheKey = $"convert_{request.FirstValue}_{request.FirstUnit}_{effectiveTargetUnit}_{request.MeasurementType}";
             
             var cachedResult = await _cacheService.GetAsync<QuantityMeasurementOperationResultDto>(cacheKey);
             if (cachedResult != null)
@@ -99,12 +102,12 @@ public class QuantityMeasurementController : ControllerBase
             }
 
             var input = new QuantityDTO(request.FirstValue, request.FirstUnit);
-            var result = _quantityService.Convert(input, targetUnit);
+            var result = _quantityService.Convert(input, effectiveTargetUnit);
 
             var response = new QuantityMeasurementOperationResultDto
             {
                 Result = result.Value,
-                ResultString = $"{request.FirstValue} {request.FirstUnit} = {result.Value} {targetUnit}",
+                ResultString = $"{request.FirstValue} {request.FirstUnit} = {result.Value} {effectiveTargetUnit}",
                 IsError = false,
                 Operation = "CONVERT",
                 MeasurementType = request.MeasurementType
